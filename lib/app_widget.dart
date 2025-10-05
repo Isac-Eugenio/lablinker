@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'app/shared/routes/routes.dart';
-import 'app/shared/theme/theme_widgets.dart';
+import 'package:lablinker/app/shared/routes/routes.dart';
 
 class AppWidget extends StatelessWidget {
   const AppWidget({super.key});
@@ -8,10 +7,12 @@ class AppWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        initialRoute: Routes.initialRoute,
-        onGenerateRoute: Routes.generateRoute,
-        theme: ThemeWidgets.system.themeData,
+        /* debugShowCheckedModeBanner: false,
+        theme: ThemeWidgets.system.themeData, */
+      initialRoute: Routes.initialRoute,
+      onGenerateRoute: Routes.generateRoute,
+      theme: ThemeData(colorSchemeSeed: Colors.lightBlueAccent, useMaterial3: true),
+      
       );
   }
 }
