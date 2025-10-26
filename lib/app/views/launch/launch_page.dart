@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:signals/signals.dart';
-import 'package:lablinker/app/shared/animations/gear_animation.dart';
 import 'package:lablinker/app/shared/routes/routes.dart';
 
 class LaunchPage extends StatefulWidget {
@@ -12,172 +10,163 @@ class LaunchPage extends StatefulWidget {
 }
 
 class _LaunchPageState extends State<LaunchPage> with TickerProviderStateMixin {
-  // Sinais para controlar as animações
-  final _scaleAndMoveLeft = signal(false);
-  final _showText = signal(false);
-  final _separateGearFromText = signal(false);
-  final _moveGearToTop = signal(false);
-  final _showTapToContinue = signal(false);
+  late final AnimationController _lettersController;
+  late final AnimationController _waveController;
+  late final AnimationController _tapController;
 
-  late final EffectCleanup _animationEffect;
-  late final AnimationController _blinkingController;
-  late final Animation<double> _blinkingAnimation;
+  final String _word = 'LabLinker';
+  final String _subtitle = 'O Poder do Maker';
+
+  bool _showSubtitle = false;
+  bool _showTapText = false;
 
   @override
   void initState() {
     super.initState();
-    _startAnimationSequence();
 
-    _blinkingController = AnimationController(duration: 700.ms, vsync: this);
-    _blinkingAnimation = Tween(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(_blinkingController);
+    // Controla a animação de cada letra aparecendo grande -> normal
+    _lettersController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 150 * _word.length + 400),
+    );
 
-    effect(() {
-      if (_showTapToContinue.value) {
-        _blinkingController.repeat(reverse: true);
-      } else {
-        _blinkingController.stop();
-      }
+    // Controla a animação wave
+    _waveController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+
+    // Controla o texto piscante
+    _tapController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+
+    // Sequência das animações
+    _lettersController.forward().whenComplete(() async {
+      await _waveController.forward(); // Wave apenas uma vez
+      await _waveController.reverse();
+
+      setState(() => _showSubtitle = true);
+
+      // Pequeno delay antes de mostrar o texto de toque
+      await Future.delayed(const Duration(milliseconds: 600));
+      setState(() => _showTapText = true);
+      _tapController.repeat(reverse: true);
     });
-
-    _animationEffect = effect(() {
-      _scaleAndMoveLeft.value;
-      _showText.value;
-      _separateGearFromText.value;
-      _moveGearToTop.value;
-      _showTapToContinue.value;
-      if (mounted) {
-        setState(() {});
-      }
-    });
-  }
-
-  void _startAnimationSequence() {
-    Future.delayed(500.ms, () => _scaleAndMoveLeft.value = true);
-    Future.delayed(1500.ms, () => _showText.value = true);
-    Future.delayed(3500.ms, () => _separateGearFromText.value = true);
-    Future.delayed(4000.ms, () => _moveGearToTop.value = true);
-    Future.delayed(5500.ms, () => _showTapToContinue.value = true);
   }
 
   @override
   void dispose() {
-    _animationEffect();
-    _blinkingController.dispose();
+    _lettersController.dispose();
+    _waveController.dispose();
+    _tapController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final screen = MediaQuery.of(context).size;
+    final letters = _word.split('');
 
     return GestureDetector(
       onTap: () {
-        // Use pushNamedAndRemoveUntil para limpar a pilha de navegação
-        Navigator.of(context).pushNamedAndRemoveUntil(
-          Routes.home,
-          (Route<dynamic> route) => false, // Remove todas as rotas anteriores
-        );
+        Navigator.of(context).pushReplacementNamed(Routes.home); // Ajuste a rota
       },
       child: Scaffold(
         backgroundColor: Colors.blue.shade700,
-        body: Stack(
-          children: [
-            // -------------------- Conteúdo principal (Título e Texto) --------------------
-            Center(
-              child: Column(
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // ------------------- Título LabLinker -------------------
+              Row(
                 mainAxisSize: MainAxisSize.min,
-                children: [
-                  // Texto "LabLinker"
-                  AnimatedOpacity(
-                    duration: 500.ms,
-                    opacity: _showText.value ? 1 : 0,
-                    child: const _AnimatedLabLinkerText(),
-                  ),
-                  const SizedBox(height: 24),
-                  // Texto "Toque para continuar"
-                  AnimatedBuilder(
-                    animation: _blinkingAnimation,
+                children: List.generate(letters.length, (i) {
+                  final start = i / letters.length;
+                  final end = (i + 1) / letters.length;
+
+                  final appear = Tween<double>(begin: 0, end: 1).animate(
+                    CurvedAnimation(
+                      parent: _lettersController,
+                      curve: Interval(start, end, curve: Curves.easeOut),
+                    ),
+                  );
+
+                  final scale = Tween<double>(begin: 2, end: 1).animate(
+                    CurvedAnimation(
+                      parent: _lettersController,
+                      curve: Interval(start, end, curve: Curves.easeOutBack),
+                    ),
+                  );
+
+                  final wave = Tween<double>(begin: 10, end: 0).animate(
+                    CurvedAnimation(
+                      parent: _waveController,
+                      curve: Interval(start, end, curve: Curves.easeInOut),
+                    ),
+                  );
+
+                  return AnimatedBuilder(
+                    animation: Listenable.merge([
+                      _lettersController,
+                      _waveController,
+                    ]),
                     builder: (context, child) {
                       return Opacity(
-                        opacity: _showTapToContinue.value
-                            ? _blinkingAnimation.value
-                            : 0,
-                        child: const Text(
-                          'Toque para continuar',
-                          style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w400,
+                        opacity: appear.value,
+                        child: Transform.translate(
+                          offset: Offset(0, wave.value),
+                          child: Transform.scale(
+                            scale: scale.value,
+                            child: Text(
+                              letters[i],
+                              style: const TextStyle(
+                                fontSize: 50,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                letterSpacing: 1.5,
+                              ),
+                            ),
                           ),
                         ),
                       );
                     },
-                  ),
-                ],
+                  );
+                }),
               ),
-            ),
 
-            // -------------------- ENGRENAGEM --------------------
-            AnimatedPositioned(
-              duration: 1.seconds,
-              curve: Curves.easeInOut,
-              left: _moveGearToTop.value
-                  ? (screen.width / 2) - 275
-                  : _separateGearFromText.value
-                  ? (screen.width / 2) - 260
-                  : _scaleAndMoveLeft.value
-                  ? (screen.width / 2) - 240
-                  : (screen.width / 2) - 35,
-              top: _moveGearToTop.value
-                  ? (screen.height / 2) - 140
-                  : (screen.height / 2) - 35,
-              child: AnimatedScale(
-                duration: _moveGearToTop.value ? 1.5.seconds : 1.seconds,
-                scale: _moveGearToTop.value ? 0.25 : 1,
-                curve: Curves.easeInOut,
-                child: const GearAnimation(radius: 80),
+              const SizedBox(height: 20),
+
+              // ------------------- Subtítulo / lema -------------------
+              AnimatedOpacity(
+                duration: 600.ms,
+                opacity: _showSubtitle ? 1 : 0,
+                child: Text(
+                  _subtitle,
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.labelMedium,
+                ),
               ),
-            ),
-          ],
+
+              const SizedBox(height: 16),
+
+              // ------------------- Toque para continuar -------------------
+              AnimatedBuilder(
+                animation: _tapController,
+                builder: (context, child) {
+                  return Opacity(
+                    opacity: _showTapText ? _tapController.value : 0,
+                    child: Text(
+                      'Toque para continuar',
+                      style: Theme.of(context).textTheme.labelSmall,
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
-    );
-  }
-}
-
-class _AnimatedLabLinkerText extends StatelessWidget {
-  const _AnimatedLabLinkerText();
-
-  @override
-  Widget build(BuildContext context) {
-    const word = 'LabLinker';
-    final letters = word.split('');
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (int i = 0; i < letters.length; i++)
-          Text(
-                letters[i],
-                style: const TextStyle(
-                  fontSize: 80,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  letterSpacing: 1.5,
-                ),
-              )
-              .animate(delay: (i * 150).ms)
-              .fadeIn(duration: 300.ms)
-              .moveX(
-                begin: 20,
-                end: 0,
-                duration: 400.ms,
-                curve: Curves.easeOut,
-              ),
-      ],
     );
   }
 }
