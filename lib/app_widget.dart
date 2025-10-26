@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lablinker/app/shared/routes/routes.dart';
+import 'package:lablinker/app/shared/theme/theme_modelview.dart';
+import 'package:provider/provider.dart';
 
 class AppWidget extends StatelessWidget {
   const AppWidget({super.key});
@@ -7,12 +9,12 @@ class AppWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        /* debugShowCheckedModeBanner: false,
-        theme: ThemeWidgets.system.themeData, */
+      debugShowCheckedModeBanner: false,
       initialRoute: Routes.initialRoute,
       onGenerateRoute: Routes.generateRoute,
-      theme: ThemeData(colorSchemeSeed: Colors.lightBlueAccent, useMaterial3: true),
-      
-      );
+      themeMode: ThemeMode.light, // alterna entre claro e escuro conforme o sistema
+      theme: Provider.of<ThemeModelView>(context).value,
+    );
   }
 }
+
