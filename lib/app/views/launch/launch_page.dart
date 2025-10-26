@@ -21,13 +21,13 @@ class _LaunchPageState extends State<LaunchPage> with TickerProviderStateMixin {
   bool _showTapText = false;
 
   @override
-  void initState() {
-    super.initState();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
     // Controla a animação de cada letra aparecendo grande -> normal
     _lettersController = AnimationController(
       vsync: this,
-      duration: Duration(milliseconds: 150 * _word.length + 400),
+      duration: Duration(milliseconds: 300 * _word.length + 400),
     );
 
     // Controla a animação wave
@@ -69,9 +69,10 @@ class _LaunchPageState extends State<LaunchPage> with TickerProviderStateMixin {
     final letters = _word.split('');
 
     return GestureDetector(
-      onTap: () {
-        Navigator.of(context).pushReplacementNamed(Routes.home); // Ajuste a rota
-      },
+      onTap: () => Navigator.of(
+        context,
+      ).pushNamedAndRemoveUntil(Routes.home, (route) => false),
+      
       child: Scaffold(
         backgroundColor: Colors.blue.shade700,
         body: Center(
