@@ -33,14 +33,47 @@ final ThemeData lightTheme = ThemeData(
   ),
 
   textTheme: TextTheme(
-    displayLarge: GoogleFonts.orbitron(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
-    displayMedium: GoogleFonts.orbitron(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
-    displaySmall: GoogleFonts.orbitron(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
+    displayLarge: GoogleFonts.orbitron(
+      fontSize: 32,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+    displayMedium: GoogleFonts.orbitron(
+      fontSize: 28,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+    displaySmall: GoogleFonts.orbitron(
+      fontSize: 24,
+      fontWeight: FontWeight.w600,
+      color: Colors.white,
+    ),
     bodyLarge: GoogleFonts.roboto(fontSize: 16, color: Colors.white),
     bodyMedium: GoogleFonts.roboto(fontSize: 14, color: Colors.white70),
-    labelLarge: GoogleFonts.roboto(fontSize: 14, color: Colors.lightBlue.shade400),
-    titleMedium: GoogleFonts.orbitron(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-    titleLarge: GoogleFonts.orbitron(fontSize: 60, fontWeight: FontWeight.bold, color: Colors.white),
+    labelLarge: GoogleFonts.roboto(
+      fontSize: 14,
+      color: Colors.lightBlue.shade400,
+    ),
+    labelMedium: GoogleFonts.orbitron(
+      fontSize: 16,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+    labelSmall: GoogleFonts.orbitron(
+      fontSize: 14,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+    titleMedium: GoogleFonts.orbitron(
+      fontSize: 16,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+    titleLarge: GoogleFonts.orbitron(
+      fontSize: 60,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
   ),
 
   cardTheme: CardThemeData(
@@ -57,7 +90,10 @@ final ThemeData lightTheme = ThemeData(
       backgroundColor: const Color(0xFF1976D2),
       foregroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      textStyle: GoogleFonts.orbitron(fontSize: 16, fontWeight: FontWeight.bold),
+      textStyle: GoogleFonts.orbitron(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+      ),
       elevation: 6,
     ),
   ),
@@ -107,13 +143,32 @@ final ThemeData darkTheme = ThemeData(
   ),
 
   textTheme: TextTheme(
-    displayLarge: GoogleFonts.orbitron(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
-    displayMedium: GoogleFonts.orbitron(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
-    displaySmall: GoogleFonts.orbitron(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
+    displayLarge: GoogleFonts.orbitron(
+      fontSize: 32,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+    displayMedium: GoogleFonts.orbitron(
+      fontSize: 28,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+    displaySmall: GoogleFonts.orbitron(
+      fontSize: 24,
+      fontWeight: FontWeight.w600,
+      color: Colors.white,
+    ),
     bodyLarge: GoogleFonts.roboto(fontSize: 16, color: Colors.white),
     bodyMedium: GoogleFonts.roboto(fontSize: 14, color: Colors.white70),
-    labelLarge: GoogleFonts.roboto(fontSize: 14, color: Colors.lightBlue.shade400),
-    titleMedium: GoogleFonts.orbitron(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+    labelLarge: GoogleFonts.roboto(
+      fontSize: 14,
+      color: Colors.lightBlue.shade400,
+    ),
+    titleMedium: GoogleFonts.orbitron(
+      fontSize: 16,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
   ),
 
   cardTheme: CardThemeData(
@@ -130,7 +185,10 @@ final ThemeData darkTheme = ThemeData(
       backgroundColor: const Color(0xFF1976D2),
       foregroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      textStyle: GoogleFonts.orbitron(fontSize: 16, fontWeight: FontWeight.bold),
+      textStyle: GoogleFonts.orbitron(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+      ),
       elevation: 3,
     ),
   ),
