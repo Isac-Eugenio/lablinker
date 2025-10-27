@@ -50,6 +50,7 @@ final ThemeData lightTheme = ThemeData(
     ),
     bodyLarge: GoogleFonts.roboto(fontSize: 16, color: Colors.white),
     bodyMedium: GoogleFonts.roboto(fontSize: 14, color: Colors.white70),
+    bodySmall: GoogleFonts.roboto(fontSize: 12, color: Colors.black54, fontWeight: FontWeight.bold),
     labelLarge: GoogleFonts.roboto(
       fontSize: 14,
       color: Colors.lightBlue.shade400,
