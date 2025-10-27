@@ -43,7 +43,7 @@ class HomePage extends StatelessWidget {
           items: [
             ItemPageWidget(title: 'Gamepad', icon: Icons.videogame_asset, route: Routes.gamepad),
             const ItemPageWidget(title: 'IOT', icon: Icons.sensors),
-            const ItemPageWidget(title: 'Consoles', icon: Icons.message),
+            ItemPageWidget(title: 'Consoles', icon: Icons.message, route: Routes.consoles),
             const ItemPageWidget(title: 'Configurações', icon: Icons.settings),
           ],
         ),
