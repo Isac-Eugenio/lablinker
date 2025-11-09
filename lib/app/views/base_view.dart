@@ -36,7 +36,7 @@ abstract class BaseView extends StatefulWidget {
 }
 
 /// Classe base do State com método abstrato buildBody()
-abstract class BaseViewState<T extends BaseView> extends State<T> {
+abstract class BaseViewState<T extends BaseView> extends State<T>{
   @override
   void initState() {
     super.initState();

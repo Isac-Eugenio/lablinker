@@ -4,14 +4,18 @@ class MessageBubbleWidget extends StatelessWidget {
   final String text;
   final bool isUser;
 
-  const MessageBubbleWidget({super.key, required this.text, required this.isUser});
+  const MessageBubbleWidget({
+    super.key,
+    required this.text,
+    required this.isUser,
+  });
 
   @override
   Widget build(BuildContext context) {
     // Define cores do tema
     final Color userColor = Theme.of(
       context,
-    ).colorScheme.primary.withOpacity(0.9);
+    ).colorScheme.primary.withAlpha((0.9 * 255).toInt());
     final Color clientColor = Colors.grey[300]!;
     final Color userTextColor = Colors.white;
     final Color clientTextColor = Colors.black87;
@@ -46,7 +50,7 @@ class MessageBubbleWidget extends StatelessWidget {
             borderRadius: borderRadius,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withAlpha((0.05 * 255).toInt()),
                 offset: const Offset(0, 2),
                 blurRadius: 3,
               ),
