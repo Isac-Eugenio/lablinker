@@ -1,7 +1,11 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:lablinker/app/models/message_model.dart';
+import 'package:lablinker/app/shared/cases/bluetooth_case.dart';
 
-class ConsoleModelview extends ChangeNotifier{
+class ConsoleModelview extends ChangeNotifier {
+  final ValueNotifier<BluetoothCase> bluetooth;
+  ConsoleModelview(this.bluetooth);
+
   final TextEditingController commandController = TextEditingController();
   final ScrollController scrollController = ScrollController();
   final List<MessageModel> messages = [];
@@ -9,6 +13,7 @@ class ConsoleModelview extends ChangeNotifier{
   void sendCommand(String command) {
     if (command.isEmpty) return;
 
+    bluetooth.value.sendMessage(command);
     // Mensagem do usuário (direita)
     messages.add(MessageModel(command, true));
 
@@ -30,5 +35,4 @@ class ConsoleModelview extends ChangeNotifier{
     messages.clear();
     notifyListeners();
   }
-  
 }

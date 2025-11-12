@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_classic_serial/flutter_bluetooth_classic.dart';
+import 'package:lablinker/app/shared/cases/bluetooth_case.dart';
 import 'package:lablinker/app/shared/widgets/notification_widget.dart';
-import 'package:lablinker/app/views/bluetooth/bluetooth_modelview.dart';
 import 'package:provider/provider.dart';
 
 class BluetoothView extends StatelessWidget {
@@ -9,7 +9,7 @@ class BluetoothView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    BluetoothModelView bluetooth = Provider.of<BluetoothModelView>(context);
+    BluetoothCase bluetooth = Provider.of<BluetoothCase>(context);
     List<BluetoothDevice> devices = bluetooth.getPairedDevices;
     return Padding(
       padding: const EdgeInsets.all(16),
@@ -28,7 +28,7 @@ class BluetoothView extends StatelessWidget {
                   : null,
               onTap: () async {
                 var deviceConnect = await bluetooth.connectToDevice(device);
-                 if(deviceConnect.isSuccess){
+                 if(deviceConnect.isSuccess && bluetooth.getConnectedDevice != null){
                   // ignore: use_build_context_synchronously
                   NotificationWidget(context: context,
                     message: 'Dispositivo conectado: ${device.name}',

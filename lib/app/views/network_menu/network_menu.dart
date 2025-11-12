@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:lablinker/app/shared/cases/bluetooth_case.dart';
 import 'package:lablinker/app/shared/commands/result.dart';
 import 'package:lablinker/app/shared/widgets/notification_widget.dart';
 import 'package:lablinker/app/views/base_view.dart';
-import 'package:lablinker/app/views/bluetooth/bluetooth_modelview.dart';
 import 'package:lablinker/app/views/bluetooth/bluetooth_view.dart';
 import 'package:lablinker/app/views/network_menu/widgets/row_network_type_widget.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +24,7 @@ class NetworkMenu extends BaseView {
 }
 
 class NetworkMenuState extends BaseViewState<NetworkMenu> {
-  late BluetoothModelView bluetooth;
+  late BluetoothCase bluetooth;
 
   final indexSignal = signal(0);
   int previousIndex = 0;
@@ -34,7 +34,7 @@ class NetworkMenuState extends BaseViewState<NetworkMenu> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    bluetooth = Provider.of<BluetoothModelView>(context, listen: false);
+    bluetooth = Provider.of<BluetoothCase>(context, listen: false);
   }
 
   Future<Result> _initializeBluetoothOnce() {

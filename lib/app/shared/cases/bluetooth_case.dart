@@ -4,8 +4,8 @@ import 'package:lablinker/app/shared/commands/result.dart';
 import 'package:lablinker/app/shared/repository/bluetooth_repository.dart';
 import 'package:lablinker/app/views/teste_view/teste_command.dart';
 
-class BluetoothModelView extends ValueNotifier<BluetoothRepository?> {
-  BluetoothModelView() : super(null) {
+class BluetoothCase extends ValueNotifier<BluetoothRepository?> {
+  BluetoothCase() : super(null) {
     value = BluetoothRepository();
   }
 
