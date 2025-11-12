@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:lablinker/app/shared/cases/bluetooth_case.dart';
 import 'package:lablinker/app/shared/theme/theme_modelview.dart';
-import 'package:lablinker/app/views/bluetooth/bluetooth_modelview.dart';
 import 'package:provider/provider.dart';
 import 'app_widget.dart';
 
@@ -16,7 +16,7 @@ void main() {
         ),
         ChangeNotifierProvider(
           create: (_) =>
-              BluetoothModelView(),
+              BluetoothCase(),
         ),
       ],
       child: const AppWidget(),

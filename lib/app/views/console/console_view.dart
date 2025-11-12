@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lablinker/app/shared/cases/bluetooth_case.dart';
 import 'package:lablinker/app/shared/routes/routes.dart';
 import 'package:lablinker/app/shared/widgets/notification_widget.dart';
 import 'package:lablinker/app/views/base_view.dart';
-import 'package:lablinker/app/views/bluetooth/bluetooth_modelview.dart';
 import 'package:lablinker/app/views/console/console_modelview.dart';
 import 'package:lablinker/app/views/console/widgets/connection_status_row_widget.dart';
 import 'package:lablinker/app/views/console/widgets/message_bubble_widget.dart';
@@ -10,7 +10,7 @@ import 'package:lablinker/app/views/network_menu/widgets/add_network_widget.dart
 import 'package:provider/provider.dart';
 
 class ConsoleView extends BaseView {
-  ConsoleView({super.key})/*  */
+  ConsoleView({super.key}) /*  */
     : super(
         title: "Console",
         rollback: true,
@@ -29,7 +29,10 @@ class ConsoleViewState extends BaseViewState<BaseView> {
   @override
   void initState() {
     super.initState();
-    modelview = ConsoleModelview();
+
+    final bluetooth = Provider.of<BluetoothCase>(context, listen: false);
+
+    modelview = ConsoleModelview(ValueNotifier<BluetoothCase>(bluetooth));
     _listener = () => setState(() {});
     modelview.addListener(_listener);
   }
@@ -44,21 +47,25 @@ class ConsoleViewState extends BaseViewState<BaseView> {
 
   @override
   Widget buildBody(BuildContext context) {
-
-    BluetoothModelView bluetooth = Provider.of<BluetoothModelView>(context);
-
     return Column(
       children: [
         InkWell(
           onTap: () {
-            NotificationWidget(context: context, message: "teste", durationSeconds: 2);
+            NotificationWidget(
+              context: context,
+              message: "teste",
+              durationSeconds: 2,
+            );
           },
-          onLongPress: () {
-          },
+          onLongPress: () {},
           child: ConnectionStatusRow(
-            deviceName: bluetooth.getConnectedDevice?.name ?? "Desconectado",
-            address: bluetooth.getConnectedDevice?.address,
-            state: true,
+            deviceName:
+                modelview.bluetooth.value.getConnectedDevice?.name ??
+                "Desconectado",
+            address: modelview.bluetooth.value.getConnectedDevice?.address,
+            state: modelview.bluetooth.value.getConnectedDevice != null
+                ? true
+                : false,
             protocolName: "Bluetooth",
             protocolIcon: Icons.bluetooth,
           ),
