@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_classic_serial/flutter_bluetooth_classic.dart';
-import 'package:lablinker/app/shared/cases/bluetooth_case.dart';
 import 'package:lablinker/app/shared/widgets/notification_widget.dart';
+import 'package:lablinker/app/views/bluetooth/bluetooth_model_view.dart';
 import 'package:provider/provider.dart';
 
 class BluetoothView extends StatelessWidget {
@@ -9,13 +9,16 @@ class BluetoothView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    BluetoothCase bluetooth = Provider.of<BluetoothCase>(context);
-    List<BluetoothDevice> devices = bluetooth.getPairedDevices;
+
+    BluetoothModelView bluetooth = Provider.of<BluetoothModelView>(context);
+
+    List<BluetoothDevice> devices = bluetooth.state.pairedDevices;
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: SingleChildScrollView(
         child: ListView.builder(
-          itemCount: bluetooth.getPairedDevices.length,
+          itemCount: bluetooth.state.pairedDevices.length,
           shrinkWrap: true,
           itemBuilder: (BuildContext context, int index) {
             BluetoothDevice device = devices[index];
@@ -23,12 +26,12 @@ class BluetoothView extends StatelessWidget {
               leading: const Icon(Icons.bluetooth),
               title: Text(device.name),
               subtitle: Text(device.address),
-              trailing: bluetooth.getConnectedDevice?.address == device.address
+              trailing: bluetooth.state.connectedDevice?.address == device.address
                   ? const Icon(Icons.check, color: Colors.green)
                   : null,
               onTap: () async {
                 var deviceConnect = await bluetooth.connectToDevice(device);
-                 if(deviceConnect.isSuccess && bluetooth.getConnectedDevice != null){
+                 if(deviceConnect.isSuccess && bluetooth.state.connectedDevice != null){
                   // ignore: use_build_context_synchronously
                   NotificationWidget(context: context,
                     message: 'Dispositivo conectado: ${device.name}',

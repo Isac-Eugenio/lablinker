@@ -1,3 +1,4 @@
+/*
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_classic_serial/flutter_bluetooth_classic.dart';
 import 'package:lablinker/app/views/base_view.dart';
@@ -6,7 +7,9 @@ import 'package:provider/provider.dart';
 
 class TesteView extends BaseView {
   TesteView({super.key})
-    : super(
+    : super(*/
+/**//*
+
         title: 'Testando Bluetooth',
         rollback: false,
         floatingActionButtonVisible: false,
@@ -168,3 +171,4 @@ class _TesteViewState extends BaseViewState<TesteView> {
     ),
   );
 }
+*/

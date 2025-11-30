@@ -4,7 +4,6 @@ import 'package:lablinker/app/views/gamepad/gamepad_menu_view.dart';
 import 'package:lablinker/app/views/home/home_page.dart';
 import 'package:lablinker/app/views/launch/launch_page.dart';
 import 'package:lablinker/app/views/network_menu/network_menu.dart';
-import 'package:lablinker/app/views/teste_view/teste_view.dart';
 import 'package:page_transition/page_transition.dart';
 
 enum Path {
@@ -44,9 +43,9 @@ class Routes {
         duration: const Duration(milliseconds: 600),
         child: HomePage(),
       );
-    } else if (settings.name == Path.teste.path) {
+    } /* else if (settings.name == Path.teste.path) {
       return MaterialPageRoute(builder: (_) => TesteView());
-    } else if (settings.name == Path.gamepad.path) {
+    }*/ else if (settings.name == Path.gamepad.path) {
       // Adicione a rota para Gamepad aqui
       return PageTransition(
         type: PageTransitionType.size,
@@ -77,17 +76,15 @@ class Routes {
           body: const Center(child: Text('Página de Configurações')),
         ),
       );
-    } 
-    else if (settings.name == Path.addNetwork.path) {
+    } else if (settings.name == Path.addNetwork.path) {
       // Adicione a rota para Adicionar Rede aqui
       return PageTransition(
         type: PageTransitionType.topToBottom,
         alignment: Alignment.center,
         duration: const Duration(milliseconds: 600),
-        child: NetworkMenu()
+        child: NetworkMenu(),
       );
-    }
-    else {
+    } else {
       return MaterialPageRoute(
         builder: (_) =>
             const Scaffold(body: Center(child: Text('Página não encontrada'))),
