@@ -21,8 +21,8 @@ class BluetoothModelView extends ChangeNotifier {
   // -----------------------------------------------------------
   // Inicializar Bluetooth
   // -----------------------------------------------------------
-  Future<Result<bool, String>> initializeBluetooth() {
-    return _case.initializeBluetooth();
+  Future<Result<bool, String>> initializeBluetooth() async {
+   return _case.initializeBluetooth();
   }
 
   // -----------------------------------------------------------

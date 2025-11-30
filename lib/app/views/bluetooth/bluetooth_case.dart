@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_bluetooth_classic_serial/flutter_bluetooth_classic.dart' hide BluetoothState;
+import 'package:flutter_bluetooth_classic_serial/flutter_bluetooth_classic.dart'
+    hide BluetoothState;
 import '../../shared/commands/async_command.dart';
 import '../../shared/commands/result.dart';
 import 'bluetooth_repository.dart';
@@ -26,16 +27,38 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
   // Inicializar Bluetooth e ouvir streams
   // -----------------------------------------------------------
   Future<Result<bool, String>> initializeBluetooth() async {
+    // Executa o comando assíncrono
     await initializeCommand.executeAsync(() async {
-      final available = await _repo.init(); // lança exception se falhar
-      if (!available) return Failure('Bluetooth não disponível');
+      try {
+        // Inicializa o repositório Bluetooth
+        final bool available = await _repo.init();
 
-      _listenStreams();
-      value = value.copyWith(isAvailable: true);
-      return Success(true);
+        if (!available) {
+          return Failure("Bluetooth não disponível");
+        }
+
+        value = value.copyWith(
+          isAvailable: true,
+          connectionState: BluetoothConnectionState(
+            isConnected: true,
+            status: "",
+            deviceAddress: '',
+          ),
+        );
+        // Começa a ouvir streams de conexão e dados
+        _listenStreams();
+
+        updatePairedDevices();
+
+        // Não atualiza value aqui, o listener faz isso
+        return Success(true);
+      } catch (e) {
+        debugPrint("Erro ao inicializar Bluetooth: $e");
+        return Failure("Erro desconhecido: $e");
+      }
     });
 
-    notifyListeners();
+    // Retorna o resultado final do comando
     return initializeCommand.result ?? Failure('Erro desconhecido');
   }
 
@@ -44,7 +67,7 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
   // -----------------------------------------------------------
   Future<Result<void, String>> connectToDevice(BluetoothDevice device) async {
     await connectCommand.executeWithAsync(
-          (d) => _repo.connect(d.address), // lança exception se falhar
+      (d) => _repo.connect(d.address), // lança exception se falhar
       device,
     );
 
@@ -61,7 +84,7 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
   // -----------------------------------------------------------
   Future<Result<void, String>> disconnectDevice() async {
     await disconnectCommand.executeAsync(
-          () => _repo.disconnect(), // lança exception se falhar
+      () => _repo.disconnect(), // lança exception se falhar
     );
 
     if (disconnectCommand.result?.isSuccess ?? false) {
@@ -69,7 +92,8 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
     }
 
     notifyListeners();
-    return disconnectCommand.result ?? Failure('Erro desconhecido ao desconectar');
+    return disconnectCommand.result ??
+        Failure('Erro desconhecido ao desconectar');
   }
 
   // -----------------------------------------------------------
@@ -77,7 +101,7 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
   // -----------------------------------------------------------
   Future<Result<void, String>> sendMessage(String msg) async {
     await sendCommand.executeWithAsync(
-          (m) => _repo.sendMessage(m), // lança exception se falhar
+      (m) => _repo.sendMessage(m), // lança exception se falhar
       msg,
     );
 
@@ -115,5 +139,4 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
       notifyListeners(); // necessário para atualizar a UI
     });
   }
-
 }

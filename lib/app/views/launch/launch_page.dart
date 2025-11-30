@@ -19,48 +19,51 @@ class _LaunchPageState extends State<LaunchPage> with TickerProviderStateMixin {
 
   bool _showSubtitle = false;
   bool _showTapText = false;
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    // Controla a animação de cada letra aparecendo grande -> normal
     _lettersController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 300 * _word.length + 400),
     );
 
-    // Controla a animação wave
     _waveController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
 
-    // Controla o texto piscante
     _tapController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
     );
 
-    // Sequência das animações
     _lettersController.forward().whenComplete(() async {
-      await _waveController.forward(); // Wave apenas uma vez
+      await _waveController.forward();
       await _waveController.reverse();
 
+      if (!mounted) return;
       setState(() => _showSubtitle = true);
 
-      // Pequeno delay antes de mostrar o texto de toque
       await Future.delayed(const Duration(milliseconds: 600));
+      if (!mounted) return;
       setState(() => _showTapText = true);
-      _tapController.repeat(reverse: true);
+
+      if (!mounted) return;
+      _tapController.repeat(
+        reverse: true,
+      ); // só repete se ainda estiver montado
     });
   }
 
   @override
   void dispose() {
+    // Pare qualquer animação ativa antes de descartar os controllers
+    _tapController.stop();
     _lettersController.dispose();
     _waveController.dispose();
     _tapController.dispose();
+
     super.dispose();
   }
 
@@ -72,7 +75,7 @@ class _LaunchPageState extends State<LaunchPage> with TickerProviderStateMixin {
       onTap: () => Navigator.of(
         context,
       ).pushNamedAndRemoveUntil(Routes.home, (route) => false),
-      
+
       child: Scaffold(
         backgroundColor: Colors.blue.shade700,
         body: Center(
