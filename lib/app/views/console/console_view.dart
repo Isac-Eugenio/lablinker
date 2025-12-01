@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:lablinker/app/shared/cases/bluetooth_case.dart';
 import 'package:lablinker/app/shared/routes/routes.dart';
 import 'package:lablinker/app/shared/widgets/notification_widget.dart';
 import 'package:lablinker/app/views/base_view.dart';
+import 'package:lablinker/app/views/bluetooth/bluetooth_model_view.dart';
 import 'package:lablinker/app/views/console/console_modelview.dart';
 import 'package:lablinker/app/views/console/widgets/connection_status_row_widget.dart';
 import 'package:lablinker/app/views/console/widgets/message_bubble_widget.dart';
@@ -29,11 +29,17 @@ class ConsoleViewState extends BaseViewState<BaseView> {
   @override
   void initState() {
     super.initState();
+    _listener = () {
+      if (!mounted) return;
+      setState(() {});
+    };
 
-    final bluetooth = Provider.of<BluetoothCase>(context, listen: false);
+    final bluetooth = Provider.of<BluetoothModelView>(context, listen: false);
 
-    modelview = ConsoleModelview(ValueNotifier<BluetoothCase>(bluetooth));
-    _listener = () => setState(() {});
+    bluetooth.addListener(_listener);
+
+    modelview = ConsoleModelview(bluetooth, context);
+
     modelview.addListener(_listener);
   }
 
@@ -60,10 +66,10 @@ class ConsoleViewState extends BaseViewState<BaseView> {
           onLongPress: () {},
           child: ConnectionStatusRow(
             deviceName:
-                modelview.bluetooth.value.getConnectedDevice?.name ??
+                modelview.bluetooth.state.connectedDevice?.name ??
                 "Desconectado",
-            address: modelview.bluetooth.value.getConnectedDevice?.address,
-            state: modelview.bluetooth.value.getConnectedDevice != null
+            address: modelview.bluetooth.state.connectedDevice?.address,
+            state: modelview.bluetooth.state.connectedDevice != null
                 ? true
                 : false,
             protocolName: "Bluetooth",

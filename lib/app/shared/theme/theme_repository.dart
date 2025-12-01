@@ -77,13 +77,35 @@ final ThemeData lightTheme = ThemeData(
     ),
   ),
 
+  /// 🔵 CardTheme corrigido (transparente, mas opaco)
   cardTheme: CardThemeData(
-    color: Colors.white,
+    color: Colors.white70,
     elevation: 3,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(16),
       side: BorderSide(color: Colors.white70, width: 1.2),
     ),
+  ),
+
+  /// 🔵 ListTileTheme adicionado, seguindo seu estilo
+  listTileTheme: ListTileThemeData(
+    tileColor: Colors.transparent,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16),
+      side: BorderSide(color: Colors.blue.shade100, width: 1.2),
+    ),
+    iconColor: const Color(0xFF1976D2),
+    textColor: Colors.black87,
+    titleTextStyle: GoogleFonts.orbitron(
+      fontSize: 16,
+      fontWeight: FontWeight.bold,
+      color: Colors.black87,
+    ),
+    subtitleTextStyle: GoogleFonts.roboto(
+      fontSize: 13,
+      color: Colors.black54,
+    ),
+    style: ListTileStyle.list
   ),
 
   elevatedButtonTheme: ElevatedButtonThemeData(
@@ -172,12 +194,33 @@ final ThemeData darkTheme = ThemeData(
     ),
   ),
 
+  /// 🔵 CardTheme corrigido
   cardTheme: CardThemeData(
-    color: const Color(0xFF102A43),
+    color: Colors.white10,
     elevation: 4,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(16),
       side: const BorderSide(color: Colors.white24, width: 1.2),
+    ),
+  ),
+
+  /// 🔵 ListTileTheme adicionado
+  listTileTheme: ListTileThemeData(
+    tileColor: Colors.white10,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16),
+      side: const BorderSide(color: Colors.white24, width: 1.2),
+    ),
+    iconColor: Colors.lightBlue,
+    textColor: Colors.white,
+    titleTextStyle: GoogleFonts.orbitron(
+      fontSize: 16,
+      fontWeight: FontWeight.bold,
+      color: Colors.white,
+    ),
+    subtitleTextStyle: GoogleFonts.roboto(
+      fontSize: 13,
+      color: Colors.white70,
     ),
   ),
 

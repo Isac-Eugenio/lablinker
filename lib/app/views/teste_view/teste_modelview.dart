@@ -1,7 +1,8 @@
+/*
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bluetooth_classic_serial/flutter_bluetooth_classic.dart';
 import 'package:lablinker/app/shared/commands/result.dart';
-import 'package:lablinker/app/shared/repository/bluetooth_repository.dart';
+import 'package:lablinker/app/views/bluetooth/bluetooth_repository.dart';
 import 'package:lablinker/app/views/teste_view/teste_command.dart';
 
 class TesteModelview extends ValueNotifier<BluetoothRepository?> {
@@ -88,3 +89,4 @@ class TesteModelview extends ValueNotifier<BluetoothRepository?> {
     return Success(null);
   }
 }
+*/

@@ -56,11 +56,22 @@ class _LaunchPageState extends State<LaunchPage> with TickerProviderStateMixin {
     });
   }
 
+  bool _disposed = false;
+
   @override
   void dispose() {
+    if (_disposed || !mounted) return;
+    _disposed = true;
+
+    _lettersController.stop();
     _lettersController.dispose();
+
+    _waveController.stop();
     _waveController.dispose();
+
+    _tapController.stop();
     _tapController.dispose();
+
     super.dispose();
   }
 
