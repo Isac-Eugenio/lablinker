@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_classic_serial/flutter_bluetooth_classic.dart';
 import 'package:lablinker/app/shared/widgets/notification_widget.dart';
 import 'package:lablinker/app/views/bluetooth/bluetooth_model_view.dart';
+import 'package:lablinker/app/views/bluetooth/widgets/build_trailing_icon_widget.dart';
 import 'package:provider/provider.dart';
 
 class BluetoothView extends StatelessWidget {
@@ -14,6 +15,9 @@ class BluetoothView extends StatelessWidget {
 
     final List<BluetoothDevice> devices = bluetooth.state.pairedDevices;
 
+    bool checkDeviceConnect(String address) =>
+        bluetooth.state.connectedDevice?.address == address;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
@@ -22,7 +26,10 @@ class BluetoothView extends StatelessWidget {
           Center(
             child: ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 22,
+                  vertical: 14,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -56,8 +63,8 @@ class BluetoothView extends StatelessWidget {
                       child: Text(
                         "Dispositivos Pareados",
                         style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold
-                        )
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
 
@@ -75,17 +82,29 @@ class BluetoothView extends StatelessWidget {
                             child: InkWell(
                               borderRadius: BorderRadius.circular(16),
                               onTap: () async {
-                                var result = await bluetooth.connectToDevice(device);
+                          // Apenas inicia a conexão e obtém o Future para a notificação
+                          final connectionFuture = bluetooth.initiateConnection(device);
 
-                                if (result.isSuccess &&
-                                    bluetooth.state.connectedDevice != null) {
-                                  NotificationWidget(
-                                    context: context,
-                                    message: "Conectado: ${device.name}",
-                                    durationSeconds: 2,
-                                  );
-                                }
-                              },
+                          connectionFuture.then((result) {
+                          // A lógica de notificação permanece na View
+                          if (result.isFailure) {
+                          NotificationWidget(
+                          context: context,
+                          message: "Erro ao Conectar ao Dispositivo ${device.name}",
+                          durationSeconds: 2,
+                          );
+                          } else {
+                          NotificationWidget(
+                          context: context,
+                          message: "Conectado ao Dispositivo ${device.name}",
+                          durationSeconds: 2,
+                          );
+                          }
+                          // O estado de UI (loading -> none/connected) já foi tratado na ViewModel.
+                          });
+                          },
+
+
                               child: Card(
                                 elevation: 4,
                                 color: Colors.blue.shade500,
@@ -98,8 +117,10 @@ class BluetoothView extends StatelessWidget {
                                   ),
                                 ),
                                 child: ListTile(
-                                  contentPadding:
-                                  const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 12,
+                                  ),
                                   leading: Icon(
                                     Icons.bluetooth,
                                     size: 30,
@@ -107,21 +128,28 @@ class BluetoothView extends StatelessWidget {
                                   ),
                                   title: Text(
                                     device.name,
-                                    style: theme.textTheme.titleMedium?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      decorationColor: Colors.black87
-                                    )
+                                    style: theme.textTheme.titleMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          decorationColor: Colors.black87,
+                                        ),
                                   ),
                                   subtitle: Text(
                                     device.address,
-                                    style: theme.textTheme.bodySmall
+                                    style: theme.textTheme.bodySmall,
                                   ),
-                                  trailing: (bluetooth.state.connectedDevice?.address ==
-                                      device.address)
-                                      ? const Icon(Icons.check, color: Colors.green, size: 28)
-                                      : null,
+                                  trailing: BuildTrailingIconWidget(
+                                    currentDeviceAddress: device
+                                        .address, // Endereço do item da lista (String)
+                                    // 1. Obtém o endereço do dispositivo que está sendo rastreado pela ViewModel
+                                    targetDeviceAddress:
+                                        bluetooth.targetAddress,
 
-                                  style: Theme.of(context).listTileTheme.style
+                                    // 2. Passa o estado atual da conexão (Connecting ou None)
+                                    connectionState: bluetooth.getStateTrailing,
+                                  ),
+
+                                  style: Theme.of(context).listTileTheme.style,
                                 ),
                               ),
                             ),

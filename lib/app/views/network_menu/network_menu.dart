@@ -80,8 +80,7 @@ class NetworkMenuState extends BaseViewState<NetworkMenu> {
         }
 
         // 2️⃣ Bluetooth ok mas sem pareados
-        if (bluetoothModel.pairedDevices == null ||
-            bluetoothModel.pairedDevices!.isEmpty) {
+        if (bluetoothModel.pairedDevices.isEmpty) {
           view = Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,

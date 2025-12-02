@@ -69,9 +69,7 @@ class ConsoleViewState extends BaseViewState<BaseView> {
                 modelview.bluetooth.state.connectedDevice?.name ??
                 "Desconectado",
             address: modelview.bluetooth.state.connectedDevice?.address,
-            state: modelview.bluetooth.state.connectedDevice != null
-                ? true
-                : false,
+            state: modelview.bluetooth.state.connectionState?.isConnected ?? false,
             protocolName: "Bluetooth",
             protocolIcon: Icons.bluetooth,
           ),
