@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bluetooth_classic_serial/flutter_bluetooth_classic.dart';
 import 'package:lablinker/app/shared/routes/routes.dart';
 import 'package:lablinker/app/shared/widgets/notification_widget.dart';
 import 'package:lablinker/app/views/base_view.dart';
@@ -8,9 +9,10 @@ import 'package:lablinker/app/views/console/widgets/connection_status_row_widget
 import 'package:lablinker/app/views/console/widgets/message_bubble_widget.dart';
 import 'package:lablinker/app/views/network_menu/widgets/add_network_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:signals/signals_flutter.dart';
 
 class ConsoleView extends BaseView {
-  ConsoleView({super.key}) /*  */
+  ConsoleView({super.key})
     : super(
         title: "Console",
         rollback: true,
@@ -25,6 +27,9 @@ class ConsoleView extends BaseView {
 class ConsoleViewState extends BaseViewState<BaseView> {
   late ConsoleModelview modelview;
   late VoidCallback _listener;
+
+  // 💡 CORREÇÃO: Usamos Signal<bool> para o estado de loading.
+  final isReconnecting = signal(false);
 
   @override
   void initState() {
@@ -45,7 +50,7 @@ class ConsoleViewState extends BaseViewState<BaseView> {
 
   @override
   void dispose() {
-    modelview.removeListener(_listener); // ✅ remove corretamente
+    modelview.bluetooth.removeListener(_listener);
     modelview.clearMessages();
     modelview.dispose();
     super.dispose();
@@ -53,23 +58,61 @@ class ConsoleViewState extends BaseViewState<BaseView> {
 
   @override
   Widget buildBody(BuildContext context) {
+    // 💡 CHAVE DA CORREÇÃO: Observar o Signal. Isso força a reconstrução quando isReconnecting muda.
+    final isLoading = isReconnecting.watch(context);
+
+    final bluetoothState = modelview.bluetooth.state;
+
     return Column(
       children: [
         InkWell(
-          onTap: () {
+          onTap: () async {
+            await modelview.bluetooth.disconnectDevice();
             NotificationWidget(
               context: context,
-              message: "teste",
+              message:
+                  "Desconectando do dispositivo ${modelview.bluetooth.connectedDevice?.name}",
               durationSeconds: 2,
             );
           },
-          onLongPress: () {},
+          onLongPress: () async {
+            BluetoothDevice? lastDevice = bluetoothState.lastConnectedDevice;
+
+            if (lastDevice == null) {
+              NotificationWidget(
+                context: context,
+                message: "Nenhum dispositivo anterior encontrado.",
+                durationSeconds: 2,
+              );
+              return;
+            }
+
+            // 1. Ativa o loading
+            isReconnecting.value = true;
+
+            // 2. Inicia a reconexão (Método corrigido: connectToDevice)
+            // Se o seu BluetoothCase usa 'initiateConnection', mantenha. Se usa 'connectToDevice', use 'connectToDevice'.
+            var result = await modelview.bluetooth.initiateConnection(
+              lastDevice,
+            );
+
+            // 3. Desativa o loading
+            isReconnecting.value = false;
+
+            // 4. Exibe o resultado
+            NotificationWidget(
+              context: context,
+              message: result.isSuccess
+                  ? "Reconectado a ${lastDevice.name}"
+                  : "Erro ao se reconectar em ${lastDevice.name}",
+              // Corrigido o erro de digitação no feedback
+              durationSeconds: 3,
+            );
+          },
           child: ConnectionStatusRow(
-            deviceName:
-                modelview.bluetooth.state.connectedDevice?.name ??
-                "Desconectado",
-            address: modelview.bluetooth.state.connectedDevice?.address,
-            state: modelview.bluetooth.state.connectionState?.isConnected ?? false,
+            deviceName: bluetoothState.connectedDevice?.name ?? "Desconectado",
+            address: bluetoothState.connectedDevice?.address,
+            state: bluetoothState.connectionState?.isConnected ?? false,
             protocolName: "Bluetooth",
             protocolIcon: Icons.bluetooth,
           ),
@@ -80,27 +123,30 @@ class ConsoleViewState extends BaseViewState<BaseView> {
           child: SingleChildScrollView(
             controller: modelview.scrollController,
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: modelview.messages
-                  .map(
-                    (msg) => Align(
-                      alignment: msg.isUser
-                          ? Alignment
-                                .centerRight // 👉 minhas mensagens à direita
-                          : Alignment.centerLeft, // 👉 cliente à esquerda
-                      child: MessageBubbleWidget(
-                        text: msg.text,
-                        isUser: msg.isUser,
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
+            // 💡 CORREÇÃO CRÍTICA: Lógica de exibição e tipo do 'children'
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: modelview.messages
+                        .map(
+                          (msg) => Align(
+                            alignment: msg.isUser
+                                ? Alignment
+                                      .centerRight // 👉 minhas mensagens à direita
+                                : Alignment.centerLeft, // 👉 cliente à esquerda
+                            child: MessageBubbleWidget(
+                              text: msg.text,
+                              isUser: msg.isUser,
+                            ),
+                          ),
+                        )
+                        .toList(),
+                  ),
           ),
         ),
 
-        // Campo de entrada fixo
+        // Campo de entrada fixo (mantido sem alterações)
         SafeArea(
           bottom: true,
           child: Container(
@@ -109,14 +155,14 @@ class ConsoleViewState extends BaseViewState<BaseView> {
             child: Row(
               children: [
                 IconButton(
-                  icon: Icon(Icons.clear_all),
+                  icon: const Icon(Icons.clear_all),
                   onPressed: () => modelview.clearMessages(),
                 ),
                 const SizedBox(width: 4),
                 Expanded(
                   child: TextField(
                     controller: modelview.commandController,
-                    obscureText: false, // ✅ evita o texto aparecer como “-----”
+                    obscureText: false,
                     enableSuggestions: true,
                     autocorrect: false,
                     decoration: const InputDecoration(
@@ -124,9 +170,11 @@ class ConsoleViewState extends BaseViewState<BaseView> {
                       border: OutlineInputBorder(),
                     ),
                     style: TextStyle(
-                      color: Colors.black, // define cor manual
-                      fontFamily: 'Roboto', // ou use a mesma fonte do tema
-                      letterSpacing: 0, // impede espaçamento estranho
+                      color:
+                          Theme.of(context).textTheme.bodyLarge?.color ??
+                          Colors.black,
+                      fontFamily: 'Roboto',
+                      letterSpacing: 0,
                     ),
                     onSubmitted: modelview.sendCommand,
                   ),

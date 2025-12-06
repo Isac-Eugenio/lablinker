@@ -7,12 +7,16 @@ class BluetoothState {
   final BluetoothConnectionState? connectionState;
   final String receivedData;
 
+  // 💡 NOVO CAMPO: Armazena o último dispositivo que estava conectado antes do clear/disconnect.
+  final BluetoothDevice? lastConnectedDevice;
+
   const BluetoothState({
     this.isAvailable = false,
     this.pairedDevices = const [],
     this.connectedDevice,
     this.connectionState,
     this.receivedData = '',
+    this.lastConnectedDevice, // 💡 NOVO PARÂMETRO NO CONSTRUTOR
   });
 
   BluetoothState copyWith({
@@ -21,15 +25,14 @@ class BluetoothState {
     BluetoothDevice? connectedDevice,
     BluetoothConnectionState? connectionState,
     String? receivedData,
+    BluetoothDevice? lastConnectedDevice, // 💡 NOVO PARÂMETRO NO copyWith
   }) {
-    // 1. Variáveis para armazenar os novos valores de connectedDevice e receivedData
+    // 1. Variáveis para armazenar os novos valores
     BluetoothDevice? newConnectedDevice = connectedDevice ?? this.connectedDevice;
     String newReceivedData = receivedData ?? this.receivedData;
 
-    // 2. Verifica se um novo connectionState foi fornecido
+    // 2. Lógica de limpeza em caso de desconexão
     if (connectionState != null) {
-      // ASSUME que BluetoothConnectionState tem uma propriedade 'isConnected'
-      // Se a nova conexão NÃO estiver conectada, limpamos o dispositivo e os dados
       if (connectionState.isConnected == false) {
         newConnectedDevice = null;
         newReceivedData = '';
@@ -42,19 +45,27 @@ class BluetoothState {
       connectedDevice: newConnectedDevice,
       receivedData: newReceivedData,
       connectionState: connectionState ?? this.connectionState,
+      // O valor de lastConnectedDevice é o fornecido (se houver) OU o valor atual do estado.
+      lastConnectedDevice: lastConnectedDevice ?? this.lastConnectedDevice,
     );
   }
 
-  // --- NOVO MÉTODO clear() ---
+  // --- MÉTODO clear() MODIFICADO ---
 
   /**
    * @description Cria uma nova instância de BluetoothState com os dados de conexão e recebidos limpos,
-   * mantendo o estado de disponibilidade (isAvailable) e a lista de dispositivos pareados (pairedDevices).
+   * salvando o dispositivo atualmente conectado (this.connectedDevice) como o "último conectado".
    * @returns {BluetoothState} Uma nova instância do estado limpo.
    */
   BluetoothState clear() {
+    // Não criamos uma variável local temporária. Passamos diretamente o valor
+    // do estado atual (this.connectedDevice) para a cópia do campo 'lastConnectedDevice'.
     return copyWith(
-      connectedDevice: null, // Limpa o dispositivo conectado
+      // 💡 CHAVE DA MUDANÇA: O dispositivo atualmente conectado (this.connectedDevice)
+      // é usado para definir o novo valor de 'lastConnectedDevice'.
+      lastConnectedDevice: connectedDevice,
+
+      connectedDevice: null,  // Limpa o dispositivo conectado atual
       connectionState: null,  // Limpa o estado da conexão
       receivedData: '',       // Limpa os dados recebidos
     );

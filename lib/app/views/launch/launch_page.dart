@@ -44,15 +44,25 @@ class _LaunchPageState extends State<LaunchPage> with TickerProviderStateMixin {
 
     // Sequência das animações
     _lettersController.forward().whenComplete(() async {
-      await _waveController.forward(); // Wave apenas uma vez
+      // Check mounted state before starting the sequence of awaiting
+      if (!mounted) return;
+
+      await _waveController.forward();
       await _waveController.reverse();
 
-      setState(() => _showSubtitle = true);
+      // 1. Check mounted before the first setState
+      if (mounted) {
+        setState(() => _showSubtitle = true);
+      }
 
       // Pequeno delay antes de mostrar o texto de toque
       await Future.delayed(const Duration(milliseconds: 600));
-      setState(() => _showTapText = true);
-      _tapController.repeat(reverse: true);
+
+      // 2. Check mounted before the second setState
+      if (mounted) {
+        setState(() => _showTapText = true);
+        _tapController.repeat(reverse: true);
+      }
     });
   }
 

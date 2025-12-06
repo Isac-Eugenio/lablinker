@@ -15,9 +15,6 @@ class BluetoothView extends StatelessWidget {
 
     final List<BluetoothDevice> devices = bluetooth.state.pairedDevices;
 
-    bool checkDeviceConnect(String address) =>
-        bluetooth.state.connectedDevice?.address == address;
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       child: Column(
@@ -82,6 +79,7 @@ class BluetoothView extends StatelessWidget {
                             child: InkWell(
                               borderRadius: BorderRadius.circular(16),
                               onTap: () async {
+
                           // Apenas inicia a conexão e obtém o Future para a notificação
                           final connectionFuture = bluetooth.initiateConnection(device);
 
