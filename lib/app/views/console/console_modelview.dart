@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bluetooth_classic_serial/bluetooth_service.dart';
+import 'package:lablinker/app/views/bluetooth/bluetooth_state.dart';
 import '../../models/message_model.dart';
 import '../../shared/commands/result.dart';
 import '../bluetooth/bluetooth_model_view.dart';
@@ -10,6 +12,8 @@ class ConsoleModelview extends ChangeNotifier {
   final TextEditingController commandController = TextEditingController();
   final ScrollController scrollController = ScrollController();
   final List<MessageModel> messages = [];
+
+  BluetoothState get bluetoothState => bluetooth.state;
 
   // Variável para armazenar o buffer parcial (resto de uma mensagem incompleta)
   String _inputBuffer = '';

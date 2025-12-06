@@ -60,8 +60,6 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
       device,
     );
 
-    debugPrint(connectCommand.result.toString());
-
     if (connectCommand.result?.isSuccess ?? false) {
       value = value.copyWith(
         connectedDevice: device,
@@ -87,7 +85,9 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
     );
 
     if (disconnectCommand.result?.isSuccess ?? false) {
-      value = value.copyWith(connectedDevice: null, lastConnectedDevice: null);
+      value = value.copyWith(connectedDevice: null,
+      connectionState: BluetoothConnectionState(isConnected: false,
+          deviceAddress: '', status: ''));
     }
 
     notifyListeners();

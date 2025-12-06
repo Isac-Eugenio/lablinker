@@ -67,13 +67,28 @@ class ConsoleViewState extends BaseViewState<BaseView> {
       children: [
         InkWell(
           onTap: () async {
-            await modelview.bluetooth.disconnectDevice();
+            var r = modelview.bluetooth.disconnectDevice();
             NotificationWidget(
               context: context,
               message:
-                  "Desconectando do dispositivo ${modelview.bluetooth.connectedDevice?.name}",
+                  "Desconectando do dispositivo ${modelview.bluetoothState.lastConnectedDevice?.name}",
               durationSeconds: 2,
             );
+
+            r.then((v) {
+              (v?.isSuccess ?? false)
+                  ? NotificationWidget(
+                      context: context,
+                      message:
+                          "Desconectado do dispositivo ${modelview.bluetoothState.lastConnectedDevice?.name}",
+                      durationSeconds: 2,
+                    )
+                  : NotificationWidget(
+                      context: context,
+                      message: v.value.toString(),
+                      durationSeconds: 2,
+                    );
+            });
           },
           onLongPress: () async {
             BluetoothDevice? lastDevice = bluetoothState.lastConnectedDevice;
@@ -138,6 +153,8 @@ class ConsoleViewState extends BaseViewState<BaseView> {
                             child: MessageBubbleWidget(
                               text: msg.text,
                               isUser: msg.isUser,
+                              deviceName: modelview.bluetoothState.lastConnectedDevice?.name ??
+                              'desconhecido',
                             ),
                           ),
                         )
@@ -170,9 +187,7 @@ class ConsoleViewState extends BaseViewState<BaseView> {
                       border: OutlineInputBorder(),
                     ),
                     style: TextStyle(
-                      color:
-                          Theme.of(context).textTheme.bodyLarge?.color ??
-                          Colors.black,
+                      color: Colors.black,
                       fontFamily: 'Roboto',
                       letterSpacing: 0,
                     ),

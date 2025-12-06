@@ -82,8 +82,13 @@ class BluetoothRepository implements BluetoothCallbacks {
   // Desconectar
   Future<Result<void, String>> disconnect() async {
     try {
-      await _bluetooth.disconnect();
+     var r =  await _bluetooth.disconnect();
+      if(!r){
+        throw Exception("Desconexão mal-sucedida");
+      }
+
       return Success(null);
+
     } catch (e) {
       return Failure('Erro ao desconectar: $e');
     }
