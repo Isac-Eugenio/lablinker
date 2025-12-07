@@ -1,14 +1,23 @@
+/*
+------------------------------------
+Arquivo: bluetooth_state.dart
+Descrição: Representa o estado reativo do Bluetooth no app,
+           incluindo disponibilidade, dispositivos pareados,
+           dispositivo conectado, dados recebidos e histórico
+           do último dispositivo conectado.
+Autor: Isac Eugenio
+------------------------------------
+*/
+
 import 'package:flutter_bluetooth_classic_serial/flutter_bluetooth_classic.dart';
 
 class BluetoothState {
-  final bool isAvailable;
-  final List<BluetoothDevice> pairedDevices;
-  final BluetoothDevice? connectedDevice;
-  final BluetoothConnectionState? connectionState;
-  final String receivedData;
-
-  // 💡 NOVO CAMPO: Armazena o último dispositivo que estava conectado antes do clear/disconnect.
-  final BluetoothDevice? lastConnectedDevice;
+  final bool isAvailable;                   // Bluetooth disponível?
+  final List<BluetoothDevice> pairedDevices; // Lista de dispositivos pareados
+  final BluetoothDevice? connectedDevice;    // Dispositivo atualmente conectado
+  final BluetoothConnectionState? connectionState; // Estado da conexão
+  final String receivedData;                 // Dados recebidos
+  final BluetoothDevice? lastConnectedDevice; // Último dispositivo conectado antes do clear/disconnect
 
   const BluetoothState({
     this.isAvailable = false,
@@ -16,27 +25,29 @@ class BluetoothState {
     this.connectedDevice,
     this.connectionState,
     this.receivedData = '',
-    this.lastConnectedDevice, // 💡 NOVO PARÂMETRO NO CONSTRUTOR
+    this.lastConnectedDevice,
   });
 
+  // -----------------------------------------------------------
+  // Cria uma cópia do estado, permitindo sobrescrever campos
+  // -----------------------------------------------------------
   BluetoothState copyWith({
     bool? isAvailable,
     List<BluetoothDevice>? pairedDevices,
     BluetoothDevice? connectedDevice,
     BluetoothConnectionState? connectionState,
     String? receivedData,
-    BluetoothDevice? lastConnectedDevice, // 💡 NOVO PARÂMETRO NO copyWith
+    BluetoothDevice? lastConnectedDevice,
   }) {
-    // 1. Variáveis para armazenar os novos valores
+    // Variáveis temporárias para ajustes
     BluetoothDevice? newConnectedDevice = connectedDevice ?? this.connectedDevice;
     String newReceivedData = receivedData ?? this.receivedData;
 
-    // 2. Lógica de limpeza em caso de desconexão
-    if (connectionState != null) {
-      if (connectionState.isConnected == false) {
-        newConnectedDevice = null;
-        newReceivedData = '';
-      }
+    // Se houver atualização no estado de conexão e ela for desconectada,
+    // limpamos o dispositivo conectado e os dados recebidos
+    if (connectionState != null && connectionState.isConnected == false) {
+      newConnectedDevice = null;
+      newReceivedData = '';
     }
 
     return BluetoothState(
@@ -45,29 +56,19 @@ class BluetoothState {
       connectedDevice: newConnectedDevice,
       receivedData: newReceivedData,
       connectionState: connectionState ?? this.connectionState,
-      // O valor de lastConnectedDevice é o fornecido (se houver) OU o valor atual do estado.
       lastConnectedDevice: lastConnectedDevice ?? this.lastConnectedDevice,
     );
   }
 
-  // --- MÉTODO clear() MODIFICADO ---
-
-  /**
-   * @description Cria uma nova instância de BluetoothState com os dados de conexão e recebidos limpos,
-   * salvando o dispositivo atualmente conectado (this.connectedDevice) como o "último conectado".
-   * @returns {BluetoothState} Uma nova instância do estado limpo.
-   */
+  // -----------------------------------------------------------
+  // Limpa dados de conexão, mas preserva o último dispositivo conectado
+  // -----------------------------------------------------------
   BluetoothState clear() {
-    // Não criamos uma variável local temporária. Passamos diretamente o valor
-    // do estado atual (this.connectedDevice) para a cópia do campo 'lastConnectedDevice'.
     return copyWith(
-      // 💡 CHAVE DA MUDANÇA: O dispositivo atualmente conectado (this.connectedDevice)
-      // é usado para definir o novo valor de 'lastConnectedDevice'.
-      lastConnectedDevice: connectedDevice,
-
-      connectedDevice: null,  // Limpa o dispositivo conectado atual
-      connectionState: null,  // Limpa o estado da conexão
-      receivedData: '',       // Limpa os dados recebidos
+      lastConnectedDevice: connectedDevice, // salva o conectado atual
+      connectedDevice: null,                // limpa o conectado
+      connectionState: null,                // limpa estado da conexão
+      receivedData: '',                     // limpa dados recebidos
     );
   }
 }

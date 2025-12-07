@@ -1,9 +1,19 @@
+/*
+--------------------------------------------
+Arquivo: message_bubble_widget.dart
+Descrição: Balão de mensagem para chat local/externo.
+           Exibe o texto da mensagem e o nome do dispositivo remetente.
+           Suporta alinhamento dinâmico para usuário ou outro dispositivo.
+Autor: Isac Eugenio
+--------------------------------------------
+*/
+
 import 'package:flutter/material.dart';
 
 class MessageBubbleWidget extends StatelessWidget {
   final String text;
-  final bool isUser;
-  final String deviceName;
+  final bool isUser;        // true = mensagem deste dispositivo
+  final String deviceName;  // nome do outro dispositivo
 
   const MessageBubbleWidget({
     super.key,
@@ -14,23 +24,28 @@ class MessageBubbleWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Define cores
-    final Color userColor = Theme.of(context).colorScheme.primary.withAlpha((0.9 * 255).toInt());
-    final Color clientColor = Colors.grey[300]!;
+    // --- Cores ---
+    final Color userColor = Theme.of(context)
+        .colorScheme
+        .primary
+        .withAlpha((0.9 * 255).toInt()); // balão do usuário
+    final Color clientColor = Colors.grey[300]!; // balão do outro dispositivo
     final Color userTextColor = Colors.white;
     final Color clientTextColor = Colors.black87;
 
-    // Define alinhamento
+    // --- Alinhamento ---
     final alignment = isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start;
 
-    // LÓGICA DO NOME: Título a ser exibido dentro do balão
+    // --- Título dentro do balão ---
     final String labelText = isUser ? "Este Dispositivo" : deviceName;
 
-    // Define as cores do texto (o título terá uma cor ligeiramente diferente)
+    // --- Cores do texto ---
     final Color messageColor = isUser ? userTextColor : clientTextColor;
-    final Color titleColor = isUser ? userTextColor.withOpacity(0.8) : clientTextColor.withOpacity(0.7);
+    final Color titleColor = isUser
+        ? userTextColor.withOpacity(0.8)
+        : clientTextColor.withOpacity(0.7);
 
-    // Define bordas
+    // --- Bordas arredondadas (diferente para usuário/cliente) ---
     final borderRadius = BorderRadius.only(
       topLeft: const Radius.circular(12),
       topRight: const Radius.circular(12),
@@ -48,8 +63,6 @@ class MessageBubbleWidget extends StatelessWidget {
             left: isUser ? 50 : 0,
             right: isUser ? 0 : 50,
           ),
-          // 💡 Ajustei o padding:
-          // O padding superior e inferior é menor aqui, pois o espaçamento será interno.
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
           decoration: BoxDecoration(
             color: isUser ? userColor : clientColor,
@@ -62,11 +75,10 @@ class MessageBubbleWidget extends StatelessWidget {
               ),
             ],
           ),
-          // 💡 NOVO: Coluna interna para empilhar o Título e a Mensagem
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start, // Títulos sempre começam à esquerda do balão
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. TÍTULO DO DISPOSITIVO
+              // --- Título do dispositivo ---
               Text(
                 labelText,
                 style: TextStyle(
@@ -76,9 +88,9 @@ class MessageBubbleWidget extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 4), // Espaçamento entre o título e a mensagem
+              const SizedBox(height: 4),
 
-              // 2. TEXTO DA MENSAGEM
+              // --- Texto da mensagem ---
               Text(
                 text,
                 style: TextStyle(

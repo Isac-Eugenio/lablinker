@@ -1,14 +1,27 @@
+/*
+------------------------------------
+Arquivo: theme_repository.dart
+Descrição: Repositório que fornece os temas claro e escuro do app, incluindo cores, fontes e estilos de widgets
+Autor: Isac Eugenio
+------------------------------------
+*/
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ThemeRepository {
+  // Define se o tema atual é escuro
   final bool isDarkMode;
 
   ThemeRepository({required this.isDarkMode});
 
+  // Retorna o tema baseado no modo
   ThemeData get theme => isDarkMode ? darkTheme : lightTheme;
 
+  // Getter para tema claro
   ThemeData get light => lightTheme;
+
+  // Getter para tema escuro
   ThemeData get dark => darkTheme;
 }
 
@@ -33,51 +46,20 @@ final ThemeData lightTheme = ThemeData(
   ),
 
   textTheme: TextTheme(
-    displayLarge: GoogleFonts.orbitron(
-      fontSize: 32,
-      fontWeight: FontWeight.bold,
-      color: Colors.white,
-    ),
-    displayMedium: GoogleFonts.orbitron(
-      fontSize: 28,
-      fontWeight: FontWeight.bold,
-      color: Colors.white,
-    ),
-    displaySmall: GoogleFonts.orbitron(
-      fontSize: 24,
-      fontWeight: FontWeight.w600,
-      color: Colors.white,
-    ),
+    displayLarge: GoogleFonts.orbitron(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
+    displayMedium: GoogleFonts.orbitron(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
+    displaySmall: GoogleFonts.orbitron(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
     bodyLarge: GoogleFonts.roboto(fontSize: 16, color: Colors.white),
     bodyMedium: GoogleFonts.roboto(fontSize: 14, color: Colors.white70),
     bodySmall: GoogleFonts.roboto(fontSize: 12, color: Colors.black54, fontWeight: FontWeight.bold),
-    labelLarge: GoogleFonts.roboto(
-      fontSize: 14,
-      color: Colors.lightBlue.shade400,
-    ),
-    labelMedium: GoogleFonts.orbitron(
-      fontSize: 16,
-      fontWeight: FontWeight.bold,
-      color: Colors.white,
-    ),
-    labelSmall: GoogleFonts.orbitron(
-      fontSize: 14,
-      fontWeight: FontWeight.bold,
-      color: Colors.white,
-    ),
-    titleMedium: GoogleFonts.orbitron(
-      fontSize: 16,
-      fontWeight: FontWeight.bold,
-      color: Colors.white,
-    ),
-    titleLarge: GoogleFonts.orbitron(
-      fontSize: 60,
-      fontWeight: FontWeight.bold,
-      color: Colors.white,
-    ),
+    labelLarge: GoogleFonts.roboto(fontSize: 14, color: Colors.lightBlue.shade400),
+    labelMedium: GoogleFonts.orbitron(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+    labelSmall: GoogleFonts.orbitron(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+    titleMedium: GoogleFonts.orbitron(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+    titleLarge: GoogleFonts.orbitron(fontSize: 60, fontWeight: FontWeight.bold, color: Colors.white),
   ),
 
-  /// 🔵 CardTheme corrigido (transparente, mas opaco)
+  // Tema para cards
   cardTheme: CardThemeData(
     color: Colors.white70,
     elevation: 3,
@@ -87,7 +69,7 @@ final ThemeData lightTheme = ThemeData(
     ),
   ),
 
-  /// 🔵 ListTileTheme adicionado, seguindo seu estilo
+  // Tema para ListTiles
   listTileTheme: ListTileThemeData(
     tileColor: Colors.transparent,
     shape: RoundedRectangleBorder(
@@ -96,16 +78,9 @@ final ThemeData lightTheme = ThemeData(
     ),
     iconColor: const Color(0xFF1976D2),
     textColor: Colors.black87,
-    titleTextStyle: GoogleFonts.orbitron(
-      fontSize: 16,
-      fontWeight: FontWeight.bold,
-      color: Colors.black87,
-    ),
-    subtitleTextStyle: GoogleFonts.roboto(
-      fontSize: 13,
-      color: Colors.black54,
-    ),
-    style: ListTileStyle.list
+    titleTextStyle: GoogleFonts.orbitron(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+    subtitleTextStyle: GoogleFonts.roboto(fontSize: 13, color: Colors.black54),
+    style: ListTileStyle.list,
   ),
 
   elevatedButtonTheme: ElevatedButtonThemeData(
@@ -113,10 +88,7 @@ final ThemeData lightTheme = ThemeData(
       backgroundColor: const Color(0xFF1976D2),
       foregroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      textStyle: GoogleFonts.orbitron(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-      ),
+      textStyle: GoogleFonts.orbitron(fontSize: 16, fontWeight: FontWeight.bold),
       elevation: 6,
     ),
   ),
@@ -124,14 +96,8 @@ final ThemeData lightTheme = ThemeData(
   inputDecorationTheme: InputDecorationTheme(
     filled: true,
     fillColor: Colors.white,
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: Colors.lightBlue.shade200),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: Colors.lightBlue.shade400, width: 2),
-    ),
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.lightBlue.shade200)),
+    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.lightBlue.shade400, width: 2)),
     labelStyle: GoogleFonts.roboto(color: Colors.lightBlue.shade400),
   ),
 
@@ -158,43 +124,19 @@ final ThemeData darkTheme = ThemeData(
     backgroundColor: const Color(0xFF1976D2),
     foregroundColor: Colors.white,
     elevation: 4,
-    titleTextStyle: GoogleFonts.orbitron(
-      fontSize: 20,
-      fontWeight: FontWeight.w600,
-      color: Colors.white,
-    ),
+    titleTextStyle: GoogleFonts.orbitron(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white),
   ),
 
   textTheme: TextTheme(
-    displayLarge: GoogleFonts.orbitron(
-      fontSize: 32,
-      fontWeight: FontWeight.bold,
-      color: Colors.white,
-    ),
-    displayMedium: GoogleFonts.orbitron(
-      fontSize: 28,
-      fontWeight: FontWeight.bold,
-      color: Colors.white,
-    ),
-    displaySmall: GoogleFonts.orbitron(
-      fontSize: 24,
-      fontWeight: FontWeight.w600,
-      color: Colors.white,
-    ),
+    displayLarge: GoogleFonts.orbitron(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
+    displayMedium: GoogleFonts.orbitron(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white),
+    displaySmall: GoogleFonts.orbitron(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white),
     bodyLarge: GoogleFonts.roboto(fontSize: 16, color: Colors.white),
     bodyMedium: GoogleFonts.roboto(fontSize: 14, color: Colors.white70),
-    labelLarge: GoogleFonts.roboto(
-      fontSize: 14,
-      color: Colors.lightBlue.shade400,
-    ),
-    titleMedium: GoogleFonts.orbitron(
-      fontSize: 16,
-      fontWeight: FontWeight.bold,
-      color: Colors.white,
-    ),
+    labelLarge: GoogleFonts.roboto(fontSize: 14, color: Colors.lightBlue.shade400),
+    titleMedium: GoogleFonts.orbitron(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
   ),
 
-  /// 🔵 CardTheme corrigido
   cardTheme: CardThemeData(
     color: Colors.white10,
     elevation: 4,
@@ -204,7 +146,6 @@ final ThemeData darkTheme = ThemeData(
     ),
   ),
 
-  /// 🔵 ListTileTheme adicionado
   listTileTheme: ListTileThemeData(
     tileColor: Colors.white10,
     shape: RoundedRectangleBorder(
@@ -213,15 +154,8 @@ final ThemeData darkTheme = ThemeData(
     ),
     iconColor: Colors.lightBlue,
     textColor: Colors.white,
-    titleTextStyle: GoogleFonts.orbitron(
-      fontSize: 16,
-      fontWeight: FontWeight.bold,
-      color: Colors.white,
-    ),
-    subtitleTextStyle: GoogleFonts.roboto(
-      fontSize: 13,
-      color: Colors.white70,
-    ),
+    titleTextStyle: GoogleFonts.orbitron(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+    subtitleTextStyle: GoogleFonts.roboto(fontSize: 13, color: Colors.white70),
   ),
 
   elevatedButtonTheme: ElevatedButtonThemeData(
@@ -229,10 +163,7 @@ final ThemeData darkTheme = ThemeData(
       backgroundColor: const Color(0xFF1976D2),
       foregroundColor: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      textStyle: GoogleFonts.orbitron(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-      ),
+      textStyle: GoogleFonts.orbitron(fontSize: 16, fontWeight: FontWeight.bold),
       elevation: 3,
     ),
   ),
@@ -240,14 +171,8 @@ final ThemeData darkTheme = ThemeData(
   inputDecorationTheme: InputDecorationTheme(
     filled: true,
     fillColor: const Color(0xFF1B2C44),
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: Colors.white24),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-      borderSide: BorderSide(color: Colors.lightBlue.shade400, width: 2),
-    ),
+    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.white24)),
+    focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.lightBlue.shade400, width: 2)),
     labelStyle: GoogleFonts.roboto(color: Colors.lightBlue.shade400),
   ),
 );

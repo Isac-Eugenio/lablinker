@@ -1,11 +1,21 @@
+/*
+--------------------------------------------
+Arquivo: connection_status_row.dart
+Descrição: Widget para exibir o status de conexão de um dispositivo.
+           Mostra protocolo, nome do dispositivo, endereço opcional
+           e ícone indicando se está conectado ou desconectado.
+Autor: Isac Eugenio
+--------------------------------------------
+*/
+
 import 'package:flutter/material.dart';
 
 class ConnectionStatusRow extends StatelessWidget {
   final String deviceName;
   final String? address;
   final bool state; // true = conectado, false = desconectado
-  final String protocolName; // exemplo: "Wi-Fi" ou "BLE"
-  final IconData protocolIcon; // ícone do protocolo
+  final String protocolName; // Ex.: "Wi-Fi" ou "BLE"
+  final IconData protocolIcon; // Ícone do protocolo
 
   const ConnectionStatusRow({
     super.key,
@@ -20,10 +30,10 @@ class ConnectionStatusRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      color: Colors.grey.shade100,
+      color: Colors.grey.shade100, // fundo leve
       child: Row(
         children: [
-          // Esquerda: ícone do protocolo + nome
+          /// Esquerda: ícone do protocolo + nome
           Row(
             children: [
               Icon(protocolIcon, color: Colors.blue),
@@ -35,9 +45,9 @@ class ConnectionStatusRow extends StatelessWidget {
             ],
           ),
 
-          const Spacer(), // espaço entre esquerda e direita
+          const Spacer(), // espaço flexível
 
-          // Centro/Direita: device + address
+          /// Centro/Direita: nome do dispositivo + endereço (opcional)
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -54,6 +64,8 @@ class ConnectionStatusRow extends StatelessWidget {
           ),
 
           const SizedBox(width: 12),
+
+          /// Status visual: círculo verde se conectado, vermelho se desconectado
           Icon(
             Icons.circle,
             color: state ? Colors.green : Colors.red,

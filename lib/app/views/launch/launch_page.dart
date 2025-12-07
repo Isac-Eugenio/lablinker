@@ -1,3 +1,13 @@
+/*
+-----------------------------------------------------------
+Arquivo: launch_page.dart
+Descrição: Tela de lançamento do app com animações de entrada.
+           Mostra o título "LabLinker" com efeito por letra,
+           animação wave, subtítulo e texto "Toque para continuar".
+Autor: Isac Eugenio
+-----------------------------------------------------------
+*/
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lablinker/app/shared/routes/routes.dart';
@@ -10,58 +20,52 @@ class LaunchPage extends StatefulWidget {
 }
 
 class _LaunchPageState extends State<LaunchPage> with TickerProviderStateMixin {
-  late final AnimationController _lettersController;
-  late final AnimationController _waveController;
-  late final AnimationController _tapController;
+  late final AnimationController _lettersController; // Controla animação das letras
+  late final AnimationController _waveController;    // Controla animação wave
+  late final AnimationController _tapController;     // Controla piscamento do texto
 
-  final String _word = 'LabLinker';
-  final String _subtitle = 'O Poder do Maker';
+  final String _word = 'LabLinker'; // Palavra principal
+  final String _subtitle = 'O Poder do Maker'; // Subtítulo / lema
 
-  bool _showSubtitle = false;
-  bool _showTapText = false;
+  bool _showSubtitle = false; // Mostra subtítulo após animação
+  bool _showTapText = false;  // Mostra texto de toque
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    // Controla a animação de cada letra aparecendo grande -> normal
+    // Inicializa animação das letras
     _lettersController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 300 * _word.length + 400),
     );
 
-    // Controla a animação wave
+    // Inicializa animação wave
     _waveController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
 
-    // Controla o texto piscante
+    // Inicializa animação de texto piscante
     _tapController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 700),
     );
 
-    // Sequência das animações
+    // Sequência de animações
     _lettersController.forward().whenComplete(() async {
-      // Check mounted state before starting the sequence of awaiting
       if (!mounted) return;
 
       await _waveController.forward();
       await _waveController.reverse();
 
-      // 1. Check mounted before the first setState
-      if (mounted) {
-        setState(() => _showSubtitle = true);
-      }
+      if (mounted) setState(() => _showSubtitle = true); // Mostra subtítulo
 
-      // Pequeno delay antes de mostrar o texto de toque
       await Future.delayed(const Duration(milliseconds: 600));
 
-      // 2. Check mounted before the second setState
       if (mounted) {
-        setState(() => _showTapText = true);
-        _tapController.repeat(reverse: true);
+        setState(() => _showTapText = true); // Mostra texto de toque
+        _tapController.repeat(reverse: true); // Pisca o texto
       }
     });
   }
@@ -87,13 +91,12 @@ class _LaunchPageState extends State<LaunchPage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final letters = _word.split('');
+    final letters = _word.split(''); // Quebra palavra em letras
 
     return GestureDetector(
-      onTap: () => Navigator.of(
-        context,
-      ).pushNamedAndRemoveUntil(Routes.home, (route) => false),
-      
+      onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(
+          Routes.home, (route) => false), // Navega para home
+
       child: Scaffold(
         backgroundColor: Colors.blue.shade700,
         body: Center(
@@ -129,10 +132,7 @@ class _LaunchPageState extends State<LaunchPage> with TickerProviderStateMixin {
                   );
 
                   return AnimatedBuilder(
-                    animation: Listenable.merge([
-                      _lettersController,
-                      _waveController,
-                    ]),
+                    animation: Listenable.merge([_lettersController, _waveController]),
                     builder: (context, child) {
                       return Opacity(
                         opacity: appear.value,

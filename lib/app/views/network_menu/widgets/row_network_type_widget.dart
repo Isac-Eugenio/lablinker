@@ -1,20 +1,29 @@
+/*
+-----------------------------------------------------------
+Arquivo: row_network_type_widget.dart
+Descrição: Widget que exibe tipos de rede (Bluetooth, HTTP, MQTT)
+           em uma linha horizontal. O item selecionado é destacado
+           e atualiza automaticamente via Signal<int>.
+Autor: Isac Eugenio
+-----------------------------------------------------------
+*/
+
 import 'package:flutter/material.dart';
 import 'package:signals/signals_flutter.dart';
 
 class RowNetworkTypeWidget extends StatelessWidget {
   final List<String> networkTypes = const ["Bluetooth", "HTTP", "MQTT"];
-  final Signal<int> indexSignal;
+  final Signal<int> indexSignal; // Índice selecionado monitorado por Signal
 
   const RowNetworkTypeWidget({super.key, required this.indexSignal});
 
   @override
   Widget build(BuildContext context) {
     final textStyle = Theme.of(context).textTheme.labelMedium?.copyWith(
-          color: Colors.white,
-        );
+      color: Colors.white,
+    );
 
-    // Agora o widget vai se reconstruir automaticamente
-    // sempre que indexSignal mudar:
+    // Observa mudanças no Signal para reconstruir o widget
     final selectedIndex = indexSignal.watch(context);
 
     return SingleChildScrollView(
@@ -34,7 +43,7 @@ class RowNetworkTypeWidget extends StatelessWidget {
                   final isSelected = index == selectedIndex;
 
                   return GestureDetector(
-                    onTap: () => indexSignal.value = index, // Atualiza o signal
+                    onTap: () => indexSignal.value = index, // Atualiza seleção
                     child: Container(
                       margin: const EdgeInsets.symmetric(horizontal: 8),
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -49,7 +58,7 @@ class RowNetworkTypeWidget extends StatelessWidget {
                         networkTypes[index],
                         style: textStyle?.copyWith(
                           fontWeight:
-                              isSelected ? FontWeight.bold : FontWeight.normal,
+                          isSelected ? FontWeight.bold : FontWeight.normal,
                         ),
                       ),
                     ),

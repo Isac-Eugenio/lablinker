@@ -1,5 +1,12 @@
-import 'dart:async';
+/*
+------------------------------------
+Arquivo: bluetooth_model_view.dart
+Descrição: ViewModel que expõe o estado do Bluetooth para a UI e gerencia ações de conexão, desconexão e envio de dados
+Autor: Isac Eugenio
+------------------------------------
+*/
 
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_classic_serial/flutter_bluetooth_classic.dart'
@@ -9,32 +16,30 @@ import '../../shared/commands/result.dart';
 import 'bluetooth_case.dart';
 import 'bluetooth_state.dart';
 
-// ViewModel responsável por expor o estado do Bluetooth para a UI
-// e orquestrar as ações de conexão/desconexão/envio de dados.
+// ViewModel responsável por controlar a UI do Bluetooth
 class BluetoothModelView extends ChangeNotifier {
   final BluetoothCase _case;
-  // Getter para expor o estado reativo do Bluetooth (ValueNotifier)
+
+  // Expondo o estado do Bluetooth
   BluetoothState get state => _case.value;
 
-  // Variável interna para rastrear o estado visual do ícone de trailing (loading/conectado/nenhum)
+  // Estado visual do ícone trailing (loading/conectado/nenhum)
   StateTrailing _stateTrailing = StateTrailing.none;
 
-  // Variável interna para rastrear o endereço do dispositivo que está sendo ativamente manipulado (tentativa de conexão)
+  // Dispositivo atualmente em tentativa de conexão
   String? _currentAttemptAddress;
 
-  // Adicione este setter público
+  // Setter público para rastrear dispositivo em tentativa
   void setCurrentAttemptAddress(String? address) {
     _currentAttemptAddress = address;
-    notifyListeners(); // ESSENCIAL: Notifica a UI sobre qual dispositivo está sendo manipulado
+    notifyListeners(); // Atualiza UI
   }
 
-  // Setter para atualizar o estado visual do trailing e limpar o rastreamento da tentativa se a ação terminar
+  // Setter para atualizar estado visual do trailing
   set stateTrailing(StateTrailing value) {
     _stateTrailing = value;
 
-    // Lógica de limpeza:
-    // Se a conexão for concluída (conectado) ou falhar (none),
-    // limpamos o endereço de tentativa para que o indicador desapareça
+    // Limpa endereço de tentativa se conexão concluída ou falhou
     if (value == StateTrailing.none || value == StateTrailing.connected) {
       _currentAttemptAddress = null;
     }
@@ -42,34 +47,22 @@ class BluetoothModelView extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Getter para expor o estado visual do trailing
+  // Getter do estado visual do trailing
   StateTrailing get getStateTrailing => _stateTrailing;
 
-  // CORREÇÃO: BluetoothModelView - targetAddress
-  // Este getter define qual endereço deve receber o status visual (loading ou conectado)
+  // Getter do endereço alvo para mostrar status visual
   String get targetAddress {
-    // 1. PRIORIDADE: Se estiver ATIVAMENTE tentando conectar (loading), retorne este endereço.
-    // Isso garante que o loading apareça no dispositivo correto.
-    if (_currentAttemptAddress != null) {
-      return _currentAttemptAddress!;
-    }
-
-    // 2. Se não houver tentativa ativa, retorne o endereço do dispositivo CONECTADO.
-    if (state.connectedDevice != null) {
-      return state.connectedDevice!.address;
-    }
-
-    // 3. Caso contrário, vazio.
+    if (_currentAttemptAddress != null) return _currentAttemptAddress!;
+    if (state.connectedDevice != null) return state.connectedDevice!.address;
     return '';
   }
 
-  // Construtor
+  // Construtor: adiciona listener no Case
   BluetoothModelView(this._case) {
-    // Observa mudanças no Case e notifica a UI
     _case.addListener(_onCaseUpdated);
   }
 
-  // Método de callback para notificar a UI quando o estado do Case muda
+  // Callback quando o Case muda
   void _onCaseUpdated() {
     notifyListeners();
   }
@@ -82,54 +75,34 @@ class BluetoothModelView extends ChangeNotifier {
   }
 
   // -----------------------------------------------------------
-  // Conectar a um dispositivo (Inicia e finaliza o rastreamento de UI)
+  // Conectar a um dispositivo
   // -----------------------------------------------------------
-  Future<Result<void, String>> initiateConnection(
-      BluetoothDevice device,
-      ) async {
-    // [ADICIONADO] Se já houver um dispositivo conectado, desconecte-o primeiro.
-    // Isso é crucial para garantir que apenas um dispositivo esteja ativo por vez.
-    if (state.connectedDevice != null &&
-        state.connectedDevice!.address != device.address) {
-      // Limpa a conexão anterior antes de tentar uma nova
+  Future<Result<void, String>> initiateConnection(BluetoothDevice device) async {
+    // Desconecta dispositivo ativo se for diferente
+    if (state.connectedDevice != null && state.connectedDevice!.address != device.address) {
       await _case.disconnectDevice();
-      // Não se preocupe com o estado do UI aqui, pois ele será atualizado
-      // pelo listener do _case assim que o estado da conexão for limpo.
     }
 
-    // 1. Início: Configura o estado de UI para 'connecting' (loading)
-    // Define qual dispositivo está em tentativa (para o trailing mostrar o loading)
+    // Define estado visual de conexão
     _currentAttemptAddress = device.address;
     _stateTrailing = StateTrailing.connecting;
     notifyListeners();
 
-    // 2. Executa a conexão (Future)
+    // Executa a conexão
     final result = await _case.connectToDevice(device);
 
-    // 3. Fim: Avalia o resultado e limpa/define o estado final
+    // Atualiza estado visual conforme sucesso ou falha
     if (result.isFailure) {
-      // Se falhar, define o estado como 'none'.
-      // O setter de stateTrailing cuidará de chamar notifyListeners()
-      // e de limpar _currentAttemptAddress para null.
       stateTrailing = StateTrailing.none;
     } else {
-      // Se for sucesso, define o estado como 'connected'.
-      // O setter de stateTrailing cuidará de chamar notifyListeners()
-      // e de limpar _currentAttemptAddress para null (já que a conexão foi estabelecida).
       stateTrailing = StateTrailing.connected;
-
-      // **Nota:** Esperamos que o BluetoothCase atualize o state.connectedDevice
-      // internamente quando a conexão for bem-sucedida.
     }
 
-
-
-    // Retorna o resultado da tentativa de conexão
     return result;
   }
 
   // -----------------------------------------------------------
-  // Desconectar
+  // Desconectar dispositivo
   // -----------------------------------------------------------
   Future<Result<void, String>> disconnectDevice() {
     return _case.disconnectDevice();
@@ -149,7 +122,8 @@ class BluetoothModelView extends ChangeNotifier {
     return _case.updatePairedDevices();
   }
 
-  void clearBuffer(){
+  // Limpa buffer de dados recebidos
+  void clearBuffer() {
     _case.clearReceivedBuffer();
   }
 
@@ -169,7 +143,6 @@ class BluetoothModelView extends ChangeNotifier {
   // -----------------------------------------------------------
   @override
   void dispose() {
-    // Remove o listener para evitar vazamento de memória
     _case.removeListener(_onCaseUpdated);
     super.dispose();
   }

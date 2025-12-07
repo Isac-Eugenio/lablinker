@@ -1,3 +1,14 @@
+/*
+-----------------------------------------------------------
+Arquivo: network_menu.dart
+Descrição: Tela para adicionar rede com seleção entre tipos
+           de conexão (Bluetooth, HTTP, MQTT). Gerencia inicialização
+           de Bluetooth, atualização de dispositivos pareados e
+           navegação entre views animadas.
+Autor: Isac Eugenio
+-----------------------------------------------------------
+*/
+
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:lablinker/app/shared/commands/result.dart';
@@ -11,34 +22,32 @@ import 'package:signals/signals_flutter.dart';
 
 class NetworkMenu extends BaseView {
   const NetworkMenu({super.key})
-    : super(
-        title: "Adicionar Rede",
-        rollback: false,
-        floatingActionButtonVisible: true,
-        floatingActionButtonIcon: Icons.save,
-        floatingActionButtonOnPressed: null,
-      );
+      : super(
+    title: "Adicionar Rede",
+    rollback: false,
+    floatingActionButtonVisible: true, // Exibe FAB
+    floatingActionButtonIcon: Icons.save, // Ícone do FAB
+    floatingActionButtonOnPressed: null, // Ação do FAB ainda não definida
+  );
 
   @override
   BaseViewState<BaseView> createState() => NetworkMenuState();
 }
 
 class NetworkMenuState extends BaseViewState<NetworkMenu> {
-  late BluetoothModelView bluetoothModel;
+  late BluetoothModelView bluetoothModel; // Model para gerenciar Bluetooth
 
-  final indexSignal = signal(0);
-  int previousIndex = 0;
+  final indexSignal = signal(0); // Tipo de rede selecionado
+  int previousIndex = 0; // Armazena índice anterior para animação
 
-  Future<Result>? _initBluetoothFuture;
+  Future<Result>? _initBluetoothFuture; // Future único para inicialização
 
   Future<Result> _initializeBluetoothOnce() async {
-    // Se já inicializou antes, apenas atualiza a lista
     if (_initBluetoothFuture != null) {
-      return bluetoothModel.updatePairedDevices();
+      return bluetoothModel.updatePairedDevices(); // Atualiza lista se já inicializou
     }
 
-    // Caso contrário, inicializa o Bluetooth e guarda o Future
-    _initBluetoothFuture = bluetoothModel.initializeBluetooth();
+    _initBluetoothFuture = bluetoothModel.initializeBluetooth(); // Inicializa Bluetooth
     return _initBluetoothFuture!;
   }
 
@@ -46,16 +55,15 @@ class NetworkMenuState extends BaseViewState<NetworkMenu> {
   Widget buildBody(BuildContext context) {
     bluetoothModel = Provider.of<BluetoothModelView>(context);
 
-    final index = indexSignal.watch(context);
-    final direction = (index - previousIndex).sign;
+    final index = indexSignal.watch(context); // Observa index selecionado
+    final direction = (index - previousIndex).sign; // Determina direção da animação
     previousIndex = index;
 
     Widget view;
 
     switch (index) {
       case 0:
-
-      // 1️⃣ Bluetooth ainda não inicializado → mostrar botão
+      // 1️⃣ Bluetooth não inicializado → mostra botão de ativar
         if (!bluetoothModel.isBluetoothAvailable) {
           view = Center(
             child: ElevatedButton.icon(
@@ -63,7 +71,6 @@ class NetworkMenuState extends BaseViewState<NetworkMenu> {
               label: const Text("Ativar Bluetooth"),
               onPressed: () async {
                 final result = await _initializeBluetoothOnce();
-
                 if (result.isFailure) {
                   NotificationWidget(
                     context: context,
@@ -71,15 +78,14 @@ class NetworkMenuState extends BaseViewState<NetworkMenu> {
                     durationSeconds: 3,
                   );
                 }
-
-                setState(() {}); // Atualiza a tela
+                setState(() {}); // Atualiza tela
               },
             ),
           );
-          break; // <- ESSENCIAL
+          break;
         }
 
-        // 2️⃣ Bluetooth ok mas sem pareados
+        // 2️⃣ Bluetooth disponível mas sem dispositivos pareados
         if (bluetoothModel.pairedDevices.isEmpty) {
           view = Center(
             child: Column(
@@ -100,32 +106,31 @@ class NetworkMenuState extends BaseViewState<NetworkMenu> {
               ],
             ),
           );
-          break; // <- ESSENCIAL
+          break;
         }
 
-        // 3️⃣ Tudo pronto → mostra o BluetoothView
+        // 3️⃣ Bluetooth disponível com dispositivos → mostra BluetoothView
         view = const BluetoothView();
         break;
 
-
       default:
-        view = const Center(child: Text("Em construção"));
+        view = const Center(child: Text("Em construção")); // Outras abas ainda não implementadas
     }
 
     final animatedView = view
         .animate(key: ValueKey(index))
         .slideX(
-          begin: direction > 0 ? 1.0 : -1.0,
-          end: 0,
-          duration: 400.ms,
-          curve: Curves.easeOutCubic,
-        )
-        .fadeIn(duration: 400.ms);
+      begin: direction > 0 ? 1.0 : -1.0,
+      end: 0,
+      duration: 400.ms,
+      curve: Curves.easeOutCubic,
+    )
+        .fadeIn(duration: 400.ms); // Animação de entrada da view
 
     return SafeArea(
       child: Column(
         children: [
-          RowNetworkTypeWidget(indexSignal: indexSignal),
+          RowNetworkTypeWidget(indexSignal: indexSignal), // Seleção de tipo de rede
           Expanded(
             child: AnimatedSwitcher(
               duration: const Duration(milliseconds: 400),

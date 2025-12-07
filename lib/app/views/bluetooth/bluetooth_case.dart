@@ -1,3 +1,11 @@
+/*
+------------------------------------
+Arquivo: bluetooth_case.dart
+Descrição: Gerencia toda a lógica de Bluetooth do app, incluindo inicialização, conexão, envio de mensagens e streams de dados
+Autor: Isac Eugenio
+------------------------------------
+*/
+
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -10,9 +18,10 @@ import 'bluetooth_command.dart';
 import 'bluetooth_state.dart';
 
 class BluetoothCase extends ValueNotifier<BluetoothState> {
+  // Repositório que faz operações reais de Bluetooth
   final BluetoothRepository _repo;
 
-  // Comandos
+  // Comandos assíncronos para execução de ações
   final AsyncCommand<bool, String> initializeCommand = BluetoothCommand();
   final AsyncCommand<void, String> connectCommand = BluetoothCommand();
   final AsyncCommand<void, String> disconnectCommand = BluetoothCommand();
@@ -25,6 +34,7 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
   StreamSubscription<String>? get dataSub => _dataSub;
   StreamSubscription<BluetoothConnectionState>? get connSub => _connSub;
 
+  // Construtor inicializa com estado padrão
   BluetoothCase(this._repo) : super(const BluetoothState());
 
   // -----------------------------------------------------------
@@ -35,7 +45,7 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
       final available = await _repo.init(); // lança exception se falhar
       if (!available) return Failure('Bluetooth não disponível');
 
-      _listenStreams();
+      _listenStreams(); // ativa listeners de conexão e dados
       value = value.copyWith(
         isAvailable: true,
         connectionState: BluetoothConnectionState(
@@ -45,7 +55,7 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
         ),
       );
 
-      updatePairedDevices();
+      updatePairedDevices(); // atualiza dispositivos pareados
 
       return Success(true);
     });
@@ -59,7 +69,7 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
   // -----------------------------------------------------------
   Future<Result<void, String>> connectToDevice(BluetoothDevice device) async {
     await connectCommand.executeWithAsync(
-      (d) => _repo.connect(d.address), // lança exception se falhar
+          (d) => _repo.connect(d.address), // conecta via repositório
       device,
     );
 
@@ -84,18 +94,18 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
   // -----------------------------------------------------------
   Future<Result<void, String>> disconnectDevice() async {
     await disconnectCommand.executeAsync(
-      () => _repo.disconnect(), // lança exception se falhar
+          () => _repo.disconnect(), // desconecta via repositório
     );
 
     if (disconnectCommand.result?.isSuccess ?? false) {
-      value = value.copyWith(connectedDevice: null,
-      connectionState: BluetoothConnectionState(isConnected: false,
-          deviceAddress: '', status: ''));
+      value = value.copyWith(
+        connectedDevice: null,
+        connectionState: BluetoothConnectionState(isConnected: false, deviceAddress: '', status: ''),
+      );
     }
 
     notifyListeners();
-    return disconnectCommand.result ??
-        Failure('Erro desconhecido ao desconectar');
+    return disconnectCommand.result ?? Failure('Erro desconhecido ao desconectar');
   }
 
   // -----------------------------------------------------------
@@ -103,7 +113,7 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
   // -----------------------------------------------------------
   Future<Result<void, String>> sendMessage(String msg) async {
     await sendCommand.executeWithAsync(
-      (m) => _repo.sendMessage(m), // lança exception se falhar
+          (m) => _repo.sendMessage(m), // envia mensagem via repositório
       msg,
     );
 
@@ -115,7 +125,7 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
   // Atualizar lista de dispositivos pareados
   // -----------------------------------------------------------
   Future<Result<List<BluetoothDevice>, String>> updatePairedDevices() async {
-    final devices = await _repo.getPairedDevices(); // lança exception se falhar
+    final devices = await _repo.getPairedDevices(); // busca dispositivos pareados
     value = value.copyWith(pairedDevices: devices);
     notifyListeners();
     return Success(devices);
@@ -142,9 +152,9 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
     });
   }
 
+  // Limpa o buffer de dados recebidos
   void clearReceivedBuffer() {
     value = value.copyWith(receivedData: '');
     notifyListeners();
   }
-
 }

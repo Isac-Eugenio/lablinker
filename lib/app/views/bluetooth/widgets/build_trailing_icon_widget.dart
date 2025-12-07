@@ -1,15 +1,28 @@
+/*
+------------------------------------
+Arquivo: build_trailing_icon_widget.dart
+Descrição: Widget que exibe ícone ou indicador de conexão para cada dispositivo na lista
+Autor: Isac Eugenio
+------------------------------------
+*/
+
 import 'package:flutter/material.dart';
 
-// Este enum rastreia o estado visual do dispositivo na lista
+// Enum que representa o estado visual do dispositivo na lista
 enum StateTrailing {
-  none,       // Nada sendo exibido (estado inicial/desconectado)
-  connecting, // Indicador de progresso (em tentativa de conexão)
-  connected,  // Ícone de sucesso (conexão estabelecida)
+  none,       // Nada sendo exibido (desconectado ou inicial)
+  connecting, // Mostra indicador de progresso
+  connected,  // Mostra ícone de sucesso
 }
 
 class BuildTrailingIconWidget extends StatelessWidget {
+  // Endereço do dispositivo atualmente processado
   final String currentDeviceAddress;
+
+  // Endereço do dispositivo alvo que deve exibir o ícone
   final String targetDeviceAddress;
+
+  // Estado atual da conexão do dispositivo
   final StateTrailing connectionState;
 
   const BuildTrailingIconWidget({
@@ -22,16 +35,16 @@ class BuildTrailingIconWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    // 1. Verifica se o endereço do dispositivo atual é o mesmo do dispositivo desejado/pressionado.
+    // 1. Verifica se o dispositivo atual é o alvo
     if (currentDeviceAddress != targetDeviceAddress) {
-      // Se não for o dispositivo correto, retorna um espaço vazio (SizedBox de tamanho zero).
+      // Se não for, retorna um widget vazio
       return const SizedBox(width: 0, height: 0);
     }
 
-    // 2. Se os endereços forem iguais, exibe o ícone de acordo com o estado.
+    // 2. Exibe o ícone correspondente ao estado
     switch (connectionState) {
       case StateTrailing.connecting:
-      // Indicador de progresso circular para mostrar que a conexão está em andamento
+      // Indicador de progresso circular para conexão em andamento
         return const SizedBox(
           width: 20,
           height: 20,
@@ -39,15 +52,15 @@ class BuildTrailingIconWidget extends StatelessWidget {
         );
 
       case StateTrailing.connected:
-      // Ícone verde de check para indicar sucesso na conexão
+      // Ícone verde de sucesso quando conectado
         return const Icon(
-            Icons.check_circle,
-            color: Colors.green,
-            size: 28
+          Icons.check_circle,
+          color: Colors.green,
+          size: 28,
         );
 
       case StateTrailing.none:
-      // Mesmo que os endereços batam, se o estado for 'none', retorna vazio.
+      // Nenhum ícone se o estado for 'none'
         return const SizedBox(width: 0, height: 0);
     }
   }
