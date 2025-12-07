@@ -1,13 +1,13 @@
 # ⚙️ LabLinker
 
-**LabLinker** é um aplicativo Android desenvolvido em **Flutter** e **Dart**, criado para ser uma ferramenta prática e poderosa para **entusiastas maker**, **estudantes de tecnologia** e **profissionais de automação e IoT**.
+**LabLinker** é um aplicativo Android desenvolvido em **Flutter** e **Dart**, criado para ser uma ferramenta prática e poderosa para **entusiastas maker**, **estudantes de tecnologia** e **profissionais de automação e IoT**.  
 O app conecta dispositivos, ideias e pessoas em um só ambiente, funcionando como uma central para controle e monitoramento de projetos eletrônicos diretamente do celular.
 
 ---
 
 ## 🚀 Visão Geral
 
-O **LabLinker** nasceu para ser o **laboratório de bolso** do maker moderno.
+O **LabLinker** nasceu para ser o **laboratório de bolso** do maker moderno.  
 Com ele, é possível integrar sistemas embarcados como **ESP32**, **Arduino** e **Node-RED**, além de visualizar e interagir com dashboards, sensores e atuadores em tempo real — tudo isso em um design leve e responsivo, 100% Android.
 
 ---
@@ -36,8 +36,27 @@ Com ele, é possível integrar sistemas embarcados como **ESP32**, **Arduino** e
 
 ## 🧠 Conceito Maker
 
-O **LabLinker** foi idealizado para unir **eletrônica maker**, **automação** e **desenvolvimento mobile** em uma só ferramenta.
+O **LabLinker** foi idealizado para unir **eletrônica maker**, **automação** e **desenvolvimento mobile** em uma só ferramenta.  
 Seu objetivo é tornar a **criação e o controle de projetos IoT** algo acessível, portátil e visual, aproximando o mundo físico do digital — diretamente no Android.
+
+---
+
+## 📥 Download do APK
+
+Você pode baixar a versão **alpha do LabLinker** diretamente clicando no link abaixo:
+
+[📱 Baixar LabLinker Alpha APK](https://github.com/Isac-Eugenio/lablinker/blob/develop/lib/apk/lablinker-alpha.apk)
+
+---
+
+## 📲 Tutorial de Instalação do APK no Android
+
+1. Faça o download do APK pelo link acima.
+2. No seu dispositivo Android, vá em **Configurações → Segurança → Instalar apps de fontes desconhecidas** e habilite para o navegador ou gerenciador de arquivos que você usou.
+3. Abra o APK baixado e siga as instruções de instalação.
+4. Após instalado, abra o app e comece a explorar o LabLinker!
+
+⚠️ **Aviso:** Como é uma versão alpha, alguns recursos podem estar em teste e instáveis.
 
 ---
 
@@ -51,8 +70,7 @@ Seu objetivo é tornar a **criação e o controle de projetos IoT** algo acessí
 
 ## 🧑‍💻 Desenvolvido por
 
-**Isac Eugenio (Isac-TecAutomation)**
+**Isac Eugenio (Isac-TecAutomation)**  
 💡 Entusiasta Maker | 🔧 Eletrônica & IoT | 💻 Flutter & Dart | 🤖 Automação Inteligente
-
 
 > 💬 *“Conectando o maker ao digital — o LabLinker transforma seu Android em um laboratório inteligente.”*
