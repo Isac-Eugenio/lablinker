@@ -150,19 +150,22 @@ class ConsoleModelview extends ChangeNotifier {
 
     _scrollToBottom(); // Reutiliza a função de rolagem
   }
-
   void clearMessages() {
     messages.clear();
     commandController.clear();
-    // NOTA: É uma boa prática limpar os buffers de parsing/estado quando o console é limpo.
+
+    // Resetar buffers locais do parser
     _inputBuffer = '';
     _lastReceivedData = '';
+    _lastValidReceivedMessage = null;
 
-    // Se a biblioteca Bluetooth tiver um método para limpar o buffer de recebimento,
-    // ele deve ser chamado aqui (ex: bluetooth.clearReceivedDataBuffer()).
+    // Resetar buffer real de dados vindos do bluetooth
+    bluetooth.clearBuffer();
 
     notifyListeners();
   }
+
+
 
   @override
   void dispose() {

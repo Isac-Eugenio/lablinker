@@ -22,6 +22,9 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
   StreamSubscription<BluetoothConnectionState>? _connSub;
   StreamSubscription<String>? _dataSub;
 
+  StreamSubscription<String>? get dataSub => _dataSub;
+  StreamSubscription<BluetoothConnectionState>? get connSub => _connSub;
+
   BluetoothCase(this._repo) : super(const BluetoothState());
 
   // -----------------------------------------------------------
@@ -36,7 +39,7 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
       value = value.copyWith(
         isAvailable: true,
         connectionState: BluetoothConnectionState(
-          isConnected: true,
+          isConnected: false,
           deviceAddress: '',
           status: '',
         ),
@@ -138,4 +141,10 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
       notifyListeners(); // necessário para atualizar a UI
     });
   }
+
+  void clearReceivedBuffer() {
+    value = value.copyWith(receivedData: '');
+    notifyListeners();
+  }
+
 }

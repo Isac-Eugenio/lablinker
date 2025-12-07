@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_classic_serial/flutter_bluetooth_classic.dart'
@@ -147,6 +149,10 @@ class BluetoothModelView extends ChangeNotifier {
     return _case.updatePairedDevices();
   }
 
+  void clearBuffer(){
+    _case.clearReceivedBuffer();
+  }
+
   // -----------------------------------------------------------
   // Getters auxiliares para a UI
   // -----------------------------------------------------------
@@ -155,6 +161,8 @@ class BluetoothModelView extends ChangeNotifier {
   BluetoothConnectionState? get connectionState => state.connectionState;
   bool get isBluetoothAvailable => state.isAvailable;
   String get receivedData => state.receivedData;
+
+  StreamSubscription<String>? get dataSub => _case.dataSub;
 
   // -----------------------------------------------------------
   // Dispose

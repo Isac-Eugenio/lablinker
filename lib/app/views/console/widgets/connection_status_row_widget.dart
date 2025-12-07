@@ -54,8 +54,6 @@ class ConnectionStatusRow extends StatelessWidget {
           ),
 
           const SizedBox(width: 12),
-
-          // Ícone de estado tipo LED
           Icon(
             Icons.circle,
             color: state ? Colors.green : Colors.red,

@@ -34,6 +34,7 @@ class BluetoothView extends StatelessWidget {
               icon: const Icon(Icons.refresh),
               label: const Text("Atualizar dispositivos"),
               onPressed: () async {
+                debugPrint(bluetooth.connectionState?.isConnected.toString());
                 await bluetooth.updatePairedDevices();
               },
             ),
