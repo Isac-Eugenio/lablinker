@@ -1,51 +1,48 @@
 /*
-------------------------------------
+-----------------------------------------------------------
 Arquivo: bluetooth_case.dart
-Descrição: Gerencia toda a lógica de Bluetooth do app, incluindo inicialização, conexão, envio de mensagens e streams de dados
+Descrição: Caso de uso responsável pelas regras de negócio
+           do Bluetooth e conversão de erros para Result.
 Autor: Isac Eugenio
-------------------------------------
+-----------------------------------------------------------
 */
 
 import 'dart:async';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bluetooth_classic_serial/flutter_bluetooth_classic.dart'
     hide BluetoothState;
-import '../../shared/commands/async_command.dart';
-import '../../shared/commands/result.dart';
+import 'package:result_dart/result_dart.dart';
+
 import 'bluetooth_repository.dart';
-import 'bluetooth_command.dart';
 import 'bluetooth_state.dart';
 
 class BluetoothCase extends ValueNotifier<BluetoothState> {
-  // Repositório que faz operações reais de Bluetooth
+  // Repositório responsável pelas operações Bluetooth
   final BluetoothRepository _repo;
 
-  // Comandos assíncronos para execução de ações
-  final AsyncCommand<bool, String> initializeCommand = BluetoothCommand();
-  final AsyncCommand<void, String> connectCommand = BluetoothCommand();
-  final AsyncCommand<void, String> disconnectCommand = BluetoothCommand();
-  final AsyncCommand<void, String> sendCommand = BluetoothCommand();
+  // Assinaturas das streams
+  StreamSubscription? _connSub;
+  StreamSubscription? _dataSub;
 
-  // Subscriptions das streams do Repository
-  StreamSubscription<BluetoothConnectionState>? _connSub;
-  StreamSubscription<String>? _dataSub;
+  StreamSubscription? get dataSub => _dataSub;
+  StreamSubscription? get connSub => _connSub;
 
-  StreamSubscription<String>? get dataSub => _dataSub;
-  StreamSubscription<BluetoothConnectionState>? get connSub => _connSub;
-
-  // Construtor inicializa com estado padrão
   BluetoothCase(this._repo) : super(const BluetoothState());
 
   // -----------------------------------------------------------
   // Inicializar Bluetooth e ouvir streams
   // -----------------------------------------------------------
-  Future<Result<bool, String>> initializeBluetooth() async {
-    await initializeCommand.executeAsync(() async {
-      final available = await _repo.init(); // lança exception se falhar
-      if (!available) return Failure('Bluetooth não disponível');
+  Future<Result<bool>> initializeBluetooth() async {
+    try {
+      final available = await _repo.init();
 
-      _listenStreams(); // ativa listeners de conexão e dados
+      if (!available) {
+        return Failure(Exception('Bluetooth não disponível'));
+      }
+
+      _listenStreams();
+
       value = value.copyWith(
         isAvailable: true,
         connectionState: BluetoothConnectionState(
@@ -55,106 +52,138 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
         ),
       );
 
-      updatePairedDevices(); // atualiza dispositivos pareados
+      await updatePairedDevices();
 
-      return Success(true);
-    });
+      notifyListeners();
 
-    notifyListeners();
-    return initializeCommand.result ?? Failure('Erro desconhecido');
+      return const Success(true);
+    } catch (e) {
+      return Failure(Exception('Erro ao inicializar Bluetooth'));
+    }
   }
 
   // -----------------------------------------------------------
   // Conectar a um dispositivo
   // -----------------------------------------------------------
-  Future<Result<void, String>> connectToDevice(BluetoothDevice device) async {
-    await connectCommand.executeWithAsync(
-          (d) => _repo.connect(d.address), // conecta via repositório
-      device,
-    );
+  Future<Result<bool>> connectToDevice(BluetoothDevice device) async {
+    try {
+      final connected = await _repo.connect(device.address);
 
-    if (connectCommand.result?.isSuccess ?? false) {
+      if (!connected) {
+        return Failure(Exception('Falha ao conectar'));
+      }
+
       value = value.copyWith(
         connectedDevice: device,
-        connectionState: BluetoothConnectionState(
-          isConnected: connectCommand.result?.value as bool,
-          deviceAddress: device.address,
-          status: connectCommand.result?.value != null ? "conectado" : "",
-        ),
         lastConnectedDevice: device,
+        connectionState: BluetoothConnectionState(
+          isConnected: true,
+          deviceAddress: device.address,
+          status: 'conectado',
+        ),
       );
-    }
 
-    notifyListeners();
-    return connectCommand.result ?? Failure('Erro desconhecido ao conectar');
+      notifyListeners();
+
+      return const Success(true);
+    } catch (e) {
+      return Failure(Exception('Erro ao conectar: $e'));
+    }
   }
 
   // -----------------------------------------------------------
-  // Desconectar
+  // Desconectar dispositivo
   // -----------------------------------------------------------
-  Future<Result<void, String>> disconnectDevice() async {
-    await disconnectCommand.executeAsync(
-          () => _repo.disconnect(), // desconecta via repositório
-    );
+  Future<Result<bool>> disconnectDevice() async {
+    try {
+      await _repo.disconnect();
 
-    if (disconnectCommand.result?.isSuccess ?? false) {
       value = value.copyWith(
         connectedDevice: null,
-        connectionState: BluetoothConnectionState(isConnected: false, deviceAddress: '', status: ''),
+        connectionState: BluetoothConnectionState(
+          isConnected: false,
+          deviceAddress: '',
+          status: '',
+        ),
       );
-    }
 
-    notifyListeners();
-    return disconnectCommand.result ?? Failure('Erro desconhecido ao desconectar');
+      notifyListeners();
+
+      return const Success(true);
+    } catch (e) {
+      return Failure(Exception('Erro ao desconectar: $e'));
+    }
   }
 
   // -----------------------------------------------------------
   // Enviar mensagem
   // -----------------------------------------------------------
-  Future<Result<void, String>> sendMessage(String msg) async {
-    await sendCommand.executeWithAsync(
-          (m) => _repo.sendMessage(m), // envia mensagem via repositório
-      msg,
-    );
+  Future<Result<bool>> sendMessage(String msg) async {
+    try {
+      await _repo.sendMessage(msg);
 
-    notifyListeners();
-    return sendCommand.result ?? Failure('Erro desconhecido ao enviar');
+      return const Success(true);
+    } catch (e) {
+      return Failure(Exception('Erro ao enviar mensagem: $e'));
+    }
   }
 
   // -----------------------------------------------------------
   // Atualizar lista de dispositivos pareados
   // -----------------------------------------------------------
-  Future<Result<List<BluetoothDevice>, String>> updatePairedDevices() async {
-    final devices = await _repo.getPairedDevices(); // busca dispositivos pareados
-    value = value.copyWith(pairedDevices: devices);
-    notifyListeners();
-    return Success(devices);
+  Future<Result<List<BluetoothDevice>>> updatePairedDevices() async {
+    try {
+      final devices = await _repo.getPairedDevices();
+
+      value = value.copyWith(pairedDevices: devices);
+
+      notifyListeners();
+
+      return Success(devices);
+    } catch (e) {
+      return Failure(Exception('Erro ao buscar dispositivos: $e'));
+    }
   }
 
   // -----------------------------------------------------------
   // Ouvir streams do Repository
   // -----------------------------------------------------------
   void _listenStreams() {
-    // Listener de conexão
     _connSub = _repo.connectionStream.listen((state) {
       value = value.copyWith(
         connectionState: state,
         connectedDevice: state.isConnected ? value.connectedDevice : null,
       );
+
       notifyListeners();
     });
 
-    // Listener de dados recebidos
     _dataSub = _repo.dataStream.listen((data) {
       final updatedData = '${value.receivedData}$data\n';
+
       value = value.copyWith(receivedData: updatedData);
-      notifyListeners(); // necessário para atualizar a UI
+
+      notifyListeners();
     });
   }
 
-  // Limpa o buffer de dados recebidos
+  // -----------------------------------------------------------
+  // Limpar buffer de dados recebidos
+  // -----------------------------------------------------------
   void clearReceivedBuffer() {
     value = value.copyWith(receivedData: '');
+
     notifyListeners();
+  }
+
+  // -----------------------------------------------------------
+  // Liberar recursos
+  // -----------------------------------------------------------
+  @override
+  void dispose() {
+    _connSub?.cancel();
+    _dataSub?.cancel();
+
+    super.dispose();
   }
 }

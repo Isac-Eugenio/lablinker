@@ -19,7 +19,7 @@ class AddNetworkWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       icon: const Icon(Icons.add), // Ícone de adicionar
-      onPressed: () => Navigator.pushNamed(context, Routes.addNetwork), // Navega para tela de adicionar rede
+      onPressed: () => Navigator.pushNamed(context, Routes.homeRoute.path), // Navega para tela de adicionar rede
     );
   }
 }

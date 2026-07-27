@@ -7,76 +7,68 @@ Autor: Isac Eugenio
 */
 
 import 'dart:async';
-import 'package:lablinker/app/shared/commands/result.dart';
+
+import 'package:result_dart/result_dart.dart';
+
 import 'async_command.dart';
 
-abstract class StreamCommand<TSuccess, TFailure>
-    extends AsyncCommand<TSuccess, TFailure> {
+abstract class StreamCommand<TSuccess extends Object>
+    extends AsyncCommand<TSuccess> {
+  // Assinatura da stream em execução
+  StreamSubscription<Result<TSuccess>>? _subscription;
 
-  // Assinatura atual da stream, usada para cancelar/resumir
-  StreamSubscription<Result<TSuccess, TFailure>>? _subscription;
+  // Controlador para expor os eventos da stream
+  final StreamController<Result<TSuccess>> _controller =
+      StreamController<Result<TSuccess>>.broadcast();
 
-  // Controlador da stream para enviar eventos para listeners externos
-  final StreamController<Result<TSuccess, TFailure>> _controller =
-  StreamController.broadcast();
+  // Stream pública
+  Stream<Result<TSuccess>> get stream => _controller.stream;
 
-  // Exposição da stream para quem quiser escutar os eventos
-  Stream<Result<TSuccess, TFailure>> get stream => _controller.stream;
-
-  // Indica se a execução terminou (sucesso ou falha)
-  bool get isDone => result is Success || result is Failure;
-
-  // Indica se está em execução ou em estado running
+  // Indica se a stream está em execução
   @override
-  bool get isRunning =>
-      (result == null || result is Running) && _subscription != null;
+  bool get isRunning => _subscription != null;
 
-  // Executa a stream, atualizando result e enviando eventos aos listeners
-  Future<void> executeStream(Stream<Result<TSuccess, TFailure>> source) async {
-    await _subscription?.cancel(); // Cancela execução anterior
+  // Executa uma stream de Result<TSuccess>
+  Future<void> executeStream(Stream<Result<TSuccess>> source) async {
+    await cancel();
+
+    setResult = null;
 
     _subscription = source.listen(
-          (event) {
-        setResult = event; // Atualiza resultado interno
-        _controller.add(event); // Envia para listeners externos
+      (event) {
+        setResult = event;
+        _controller.add(event);
       },
-      onError: (e, st) {
-        // Captura erro e converte em Failure
-        final failure = e is TFailure
-            ? Failure<TSuccess, TFailure>(e)
-            : Failure<TSuccess, TFailure>(Exception(e.toString()) as TFailure);
-        setResult = failure;
-        _controller.add(failure);
+      onError: (Object error, StackTrace stackTrace) {},
+      onDone: () async {
+        await cancel();
       },
-      onDone: cancel, // Ao terminar, cancela assinatura
     );
   }
 
-  // Pausa a execução da stream
+  // Pausa a stream
   void pause() {
     _subscription?.pause();
     notifyListeners();
   }
 
-  // Retoma a execução da stream
+  // Retoma a stream
   void resume() {
     _subscription?.resume();
     notifyListeners();
   }
 
-  // Cancela a execução da stream
+  // Cancela a stream
   Future<void> cancel() async {
     await _subscription?.cancel();
     _subscription = null;
     notifyListeners();
   }
 
-  // Fecha o controlador e limpa a assinatura ao descartar o comando
   @override
   void dispose() {
-    cancel();
+    _subscription?.cancel();
     _controller.close();
     super.dispose();
-    notifyListeners();
   }
 }

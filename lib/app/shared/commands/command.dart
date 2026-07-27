@@ -1,67 +1,70 @@
 /*
-------------------------------------
+-----------------------------------------------------------
 Arquivo: command.dart
-Descrição: Comando genérico que gerencia execução, resultado e estado (sucesso, erro ou execução em andamento)
+Descrição: Classe base para execução de comandos que retornam
+           Result<TSuccess, TFailure>, notificando os listeners
+           durante a execução e após sua conclusão.
 Autor: Isac Eugenio
-------------------------------------
+-----------------------------------------------------------
 */
 
-import 'package:flutter/cupertino.dart';
-import 'result.dart';
+import 'package:flutter/material.dart';
+import 'package:result_dart/result_dart.dart';
 
-abstract class Command<TSuccess, TFailure> extends ChangeNotifier {
-  // Armazena o resultado da execução (sucesso ou falha)
-  Result<TSuccess, TFailure>? _result;
+abstract class Command<TSuccess extends Object> extends ChangeNotifier {
+  // Armazena o resultado da última execução
+  Result<TSuccess>? _result;
 
   // Retorna o resultado atual
-  Result<TSuccess, TFailure>? get result => _result;
+  Result<TSuccess>? get result => _result;
 
-  // Define o resultado e notifica listeners
-  set setResult(Result<TSuccess, TFailure>? value) {
+  // Atualiza o resultado e notifica os listeners
+  set setResult(Result<TSuccess>? value) {
     _result = value;
     notifyListeners();
   }
 
-  // Indica se o comando ainda está em execução (resultado nulo)
+  // Indica se o comando está em execução
   bool get isRunning => _result == null;
 
-  // Indica se o comando foi concluído com sucesso
-  bool get isSuccess => _result is Success<TSuccess, TFailure>;
+  // Indica se o resultado foi sucesso
+  bool get isSuccess => _result?.isSuccess() ?? false;
 
-  // Indica se o comando falhou
-  bool get isError => _result is Failure<TSuccess, TFailure>;
+  // Indica se o resultado foi erro
+  bool get isError => _result?.isError() ?? false;
 
-  // Retorna o valor de sucesso, se houver
+  // Retorna o valor de sucesso
   TSuccess? get success => _result?.getOrNull();
 
-  // Retorna o valor de erro, se houver
-  TFailure? get error => _result?.getOrNullFailure();
+  // Retorna a exceção, caso exista
+  Exception? get error => _result?.exceptionOrNull();
 
-  // Executa uma ação com parâmetro, atualizando o resultado e notificando listeners
-  void executeWith(Function action, dynamic param) {
+  // Executa uma ação com parâmetro
+  void executeWith<TParam>(
+    Result<TSuccess> Function(TParam param) action,
+    TParam param,
+  ) {
     _result = null;
     notifyListeners();
 
-    try {
-      _result = action(param);
-    } catch (e) {
-      _result = Failure<TSuccess, TFailure>(e as TFailure);
-    } finally {
-      notifyListeners();
-    }
+    _result = action(param);
+
+    notifyListeners();
   }
 
-  // Executa uma ação sem parâmetro, atualizando o resultado e notificando listeners
-  void execute(Result<TSuccess, TFailure> Function() action) {
+  // Executa uma ação sem parâmetros
+  void execute(Result<TSuccess> Function() action) {
     _result = null;
     notifyListeners();
 
-    try {
-      _result = action();
-    } catch (e) {
-      _result = Failure<TSuccess, TFailure>(e as TFailure);
-    } finally {
-      notifyListeners();
-    }
+    _result = action();
+
+    notifyListeners();
+  }
+
+  // Limpa o resultado
+  void clear() {
+    _result = null;
+    notifyListeners();
   }
 }

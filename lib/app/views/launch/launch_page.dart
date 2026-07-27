@@ -95,7 +95,7 @@ class _LaunchPageState extends State<LaunchPage> with TickerProviderStateMixin {
 
     return GestureDetector(
       onTap: () => Navigator.of(context).pushNamedAndRemoveUntil(
-          Routes.home, (route) => false), // Navega para home
+          Routes.homeRoute.path, (route) => false), // Navega para home
 
       child: Scaffold(
         backgroundColor: Colors.blue.shade700,

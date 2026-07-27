@@ -7,14 +7,37 @@ Autor: Isac Eugenio
 */
 
 import 'package:flutter/material.dart';
-import 'package:lablinker/app/views/console/console_view.dart';
-import 'package:lablinker/app/views/gamepad/gamepad_menu_view.dart';
-import 'package:lablinker/app/views/home/home_view.dart';
-import 'package:lablinker/app/views/launch/launch_page.dart';
-import 'package:lablinker/app/views/network_menu/network_menu.dart';
-import 'package:page_transition/page_transition.dart';
+import 'package:lablinker/app/shared/routes/console_bluetooth_route.dart';
+import 'package:lablinker/app/shared/routes/home_route.dart';
+import 'package:lablinker/app/shared/routes/launch_route.dart';
+import 'package:lablinker/app/shared/routes/not_found_route.dart';
+import 'package:lablinker/app/shared/routes/protocols_route.dart';
+import 'package:lablinker/app/shared/routes/routes_config.dart';
+import 'package:signals/signals_flutter.dart';
 
-// Enum que define caminhos do app
+class Routes {
+  static Signal<ModeTypeview> modeTypeview = Signal(ModeTypeview.console);
+
+  static HomeRoute get homeRoute => HomeRoute();
+  static ConsoleBluetoothRoute get consoleBluetoothRoute => ConsoleBluetoothRoute();
+  static LaunchRoute get launchRoute => LaunchRoute();
+  static NotFoundRoute get notFoundRoute => NotFoundRoute();
+  static ProtocolsRoute get protocolsRoute =>
+      ProtocolsRoute(modeTypeview.value);
+  static String get initialRoute => launchRoute.path;
+
+  static Route<dynamic> generateRoute(RouteSettings settings) {
+    return switch (settings.name) {
+      HomeRoute.getPath => homeRoute.materialPage,
+      LaunchRoute.getPath => launchRoute.materialPage,
+      ProtocolsRoute.getPath => protocolsRoute.materialPage,
+      ConsoleBluetoothRoute.getPath => consoleBluetoothRoute.materialPage,
+      _ => notFoundRoute.materialPage,
+    };
+  }
+}
+
+/* // Enum que define caminhos do app
 enum Path {
   launch('/start'),
   home('/home'),
@@ -107,3 +130,4 @@ class Routes {
     }
   }
 }
+ */

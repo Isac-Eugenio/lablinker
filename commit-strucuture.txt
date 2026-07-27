@@ -1,0 +1,36 @@
+<tipo>(<escopo>): <título>
+
+Resumo
+-------
+<Resumo curto da alteração.>
+
+Arquivos modificados
+--------------------
+- arquivo_1.dart
+- arquivo_2.dart
+- ...
+
+Alterações
+----------
+- 
+- 
+- 
+
+Motivação
+---------
+- 
+- 
+
+Impacto
+-------
+- 
+- 
+
+TODO
+----
+- [ ] 
+- [ ] 
+
+Observações
+-----------
+- 

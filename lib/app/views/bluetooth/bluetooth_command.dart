@@ -9,5 +9,5 @@ Autor: Isac Eugenio
 import 'package:lablinker/app/shared/commands/async_command.dart';
 
 // Extende AsyncCommand sem adicionar lógica extra, servindo como comando específico para Bluetooth
-class BluetoothCommand<TSuccess, TFailure>
-    extends AsyncCommand<TSuccess, TFailure> {}
+class BluetoothCommand<TSuccess extends Object>
+    extends AsyncCommand<TSuccess> {}

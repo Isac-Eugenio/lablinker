@@ -1,16 +1,16 @@
 /*
-------------------------------------
+-----------------------------------------------------------
 Arquivo: bluetooth_repository.dart
-Descrição: Repository responsável por gerenciar a camada de acesso ao Bluetooth,
-           incluindo inicialização, conexão, desconexão, envio de mensagens
-           e streams de dados/estado.
+Descrição: Repositório responsável pela comunicação com o
+           Bluetooth clássico.
 Autor: Isac Eugenio
-------------------------------------
+-----------------------------------------------------------
 */
 
 import 'dart:async';
+
 import 'package:flutter_bluetooth_classic_serial/flutter_bluetooth_classic.dart';
-import '../../shared/commands/result.dart';
+
 import 'bluetooth_listeners.dart';
 
 class BluetoothRepository implements BluetoothCallbacks {
@@ -18,10 +18,15 @@ class BluetoothRepository implements BluetoothCallbacks {
   late final BluetoothListeners _listeners;
 
   // Streams para expor estado e dados recebidos
-  final _connectionController = StreamController<BluetoothConnectionState>.broadcast();
-  final _dataController = StreamController<String>.broadcast();
+  final StreamController<BluetoothConnectionState> _connectionController =
+      StreamController.broadcast();
 
-  Stream<BluetoothConnectionState> get connectionStream => _connectionController.stream;
+  final StreamController<String> _dataController = StreamController.broadcast();
+
+  // Streams públicas
+  Stream<BluetoothConnectionState> get connectionStream =>
+      _connectionController.stream;
+
   Stream<String> get dataStream => _dataController.stream;
 
   FlutterBluetoothClassic get bluetoothClassic => _bluetooth;
@@ -34,96 +39,76 @@ class BluetoothRepository implements BluetoothCallbacks {
   // Inicializa o Bluetooth e inicia os listeners
   // -----------------------------------------------------------
   Future<bool> init() async {
-    try {
-      final supported = await _bluetooth.isBluetoothSupported();
-      final enabled = await _bluetooth.isBluetoothEnabled();
-      final available = supported && enabled;
+    final supported = await _bluetooth.isBluetoothSupported();
+    final enabled = await _bluetooth.isBluetoothEnabled();
 
-      if (!available) return false;
+    final available = supported && enabled;
 
-      _listeners.start(); // inicia listeners de eventos
-      return true;
-    } catch (e) {
-      throw 'Erro ao inicializar Bluetooth: $e';
+    if (!available) {
+      return false;
+    }
+
+    _listeners.start();
+
+    return true;
+  }
+
+  // -----------------------------------------------------------
+  // Retorna a lista de dispositivos pareados
+  // -----------------------------------------------------------
+  Future<List<BluetoothDevice>> getPairedDevices() {
+    return _bluetooth.getPairedDevices();
+  }
+
+  // -----------------------------------------------------------
+  // Conecta a um dispositivo
+  // -----------------------------------------------------------
+  Future<bool> connect(String address) async {
+    await _bluetooth.connect(address);
+
+    final state = await _bluetooth.onConnectionChanged
+        .firstWhere((s) => s.deviceAddress == address)
+        .timeout(const Duration(seconds: 5));
+
+    return state.isConnected;
+  }
+
+  // -----------------------------------------------------------
+  // Desconecta do dispositivo
+  // -----------------------------------------------------------
+  Future<void> disconnect() async {
+    final disconnected = await _bluetooth.disconnect();
+
+    if (!disconnected) {
+      throw Exception('Falha ao desconectar.');
     }
   }
 
   // -----------------------------------------------------------
-  // Retorna lista de dispositivos pareados
+  // Envia uma mensagem
   // -----------------------------------------------------------
-  Future<List<BluetoothDevice>> getPairedDevices() async {
-    try {
-      return await _bluetooth.getPairedDevices();
-    } catch (e) {
-      throw 'Erro ao obter dispositivos pareados: $e';
-    }
+  Future<void> sendMessage(String message) async {
+    await _bluetooth.sendString(message);
   }
 
   // -----------------------------------------------------------
-  // Conectar a um dispositivo específico
-  // -----------------------------------------------------------
-  Future<Result<bool, String>> connect(String address) async {
-    try {
-      await _bluetooth.connect(address);
-
-      // Aguarda primeiro evento de mudança de estado para o dispositivo correto
-      final state = await _bluetooth.onConnectionChanged
-          .firstWhere((s) => s.deviceAddress == address)
-          .timeout(const Duration(seconds: 5)); // Timeout para evitar travamento
-
-      if (state.isConnected) {
-        return Success(true);
-      } else {
-        return Failure('Falha ao conectar ao dispositivo $address. Estado final: ${state.isConnected}');
-      }
-    } on TimeoutException {
-      return Failure('Erro de Timeout ao conectar ao dispositivo $address.');
-    } catch (e) {
-      return Failure('Erro ao conectar ao dispositivo $address: $e');
-    }
-  }
-
-  // -----------------------------------------------------------
-  // Desconectar dispositivo
-  // -----------------------------------------------------------
-  Future<Result<void, String>> disconnect() async {
-    try {
-      var r = await _bluetooth.disconnect();
-      if (!r) throw Exception("Desconexão mal-sucedida");
-
-      return Success(null);
-    } catch (e) {
-      return Failure('Erro ao desconectar: $e');
-    }
-  }
-
-  // -----------------------------------------------------------
-  // Enviar mensagem via Bluetooth
-  // -----------------------------------------------------------
-  Future<Result<void, String>> sendMessage(String msg) async {
-    try {
-      await _bluetooth.sendString(msg);
-      return Success(null);
-    } catch (e) {
-      return Failure('Erro ao enviar mensagem: $e');
-    }
-  }
-
-  // -----------------------------------------------------------
-  // Callbacks para listeners
+  // Callback de alteração de conexão
   // -----------------------------------------------------------
   @override
   void onConnectionChanged(BluetoothConnectionState state) {
     _connectionController.add(state);
   }
 
+  // -----------------------------------------------------------
+  // Callback de dados recebidos
+  // -----------------------------------------------------------
   @override
   void onDataReceived(BluetoothData data) {
     _dataController.add(data.asString());
   }
 
   // -----------------------------------------------------------
-  // Limpeza de recursos
+  // Libera os recursos utilizados
   // -----------------------------------------------------------
   void dispose() {
     _listeners.dispose();
