@@ -11,9 +11,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 
 import 'app/shared/theme/theme_modelview.dart';
-import 'app/views/protocols_menu/protocols_menu_model_view.dart';
-import 'app/views/bluetooth/bluetooth_case.dart';
-import 'app/views/bluetooth/bluetooth_repository.dart';
+import 'app/shared/communication/bluetooth/bluetooth_case.dart';
+import 'app/shared/communication/bluetooth/bluetooth_repository.dart';
 import 'app_widget.dart';
 
 void main() {
@@ -37,9 +36,6 @@ void main() {
           create: (context) =>
               BluetoothCase(context.read<BluetoothRepository>()),
         ),
-
-        // Menu de protocolos
-        ChangeNotifierProvider(create: (_) => ProtocolsMenuModelView()),
       ],
 
       child: const AppWidget(),

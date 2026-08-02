@@ -14,8 +14,6 @@ import 'package:lablinker/app/shared/widgets/app_bar_widget.dart';
 import 'package:lablinker/app/shared/widgets/adaptive_grid_menu.dart';
 import 'package:lablinker/app/shared/widgets/item_page_widget.dart';
 import 'package:lablinker/app/shared/routes/routes.dart';
-import 'package:lablinker/app/views/protocols_menu/protocols_menu_model_view.dart';
-import 'package:provider/provider.dart';
 
 class HomeView extends StatelessWidget {
   final String title;
@@ -24,9 +22,6 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ProtocolsMenuModelView protocolsMenuModelView = context
-        .watch<ProtocolsMenuModelView>();
-
     return Scaffold(
       // Barra de navegação personalizada
       appBar: AppBarWidget(title: title, rollback: false),
@@ -40,22 +35,20 @@ class HomeView extends StatelessWidget {
             ItemPageWidget(
               title: 'Gamepad',
               icon: Icons.videogame_asset,
-              action: () =>
-                  protocolsMenuModelView.setTypeView(ModeTypeview.gamepad),
+              route: Routes.protocolsRoute.path,
+              action: () => Routes.modeTypeview.set(ModeTypeview.gamepad),
             ),
             ItemPageWidget(
               title: 'IOT',
               icon: Icons.sensors,
-              action: () =>
-                  protocolsMenuModelView.setTypeView(ModeTypeview.iot),
+              action: () => Routes.modeTypeview.set(ModeTypeview.iot),
               // Sem rota definida → apenas visual
             ),
             ItemPageWidget(
               title: 'Consoles',
               icon: Icons.message,
               route: Routes.protocolsRoute.path,
-              action: () =>
-                  protocolsMenuModelView.setTypeView(ModeTypeview.console),
+              action: () => Routes.modeTypeview.set(ModeTypeview.console),
             ),
             const ItemPageWidget(
               title: 'Configurações',

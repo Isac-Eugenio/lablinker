@@ -7,6 +7,7 @@ Autor: Isac Eugenio
 */
 
 import 'package:flutter/material.dart';
+import 'package:lablinker/app/shared/routes/app_context.dart';
 import 'package:lablinker/app/shared/routes/routes.dart';
 import 'package:lablinker/app/shared/theme/theme_modelview.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +26,10 @@ class AppWidget extends StatelessWidget {
 
       // Gera rotas dinamicamente conforme a navegação
       onGenerateRoute: Routes.generateRoute,
+
+      // navegador global para acessar um context estatico
+
+      navigatorKey:  AppContext.navigatorKey,
 
       // Define o modo de tema (claro/escuro) baseado no sistema
       themeMode: ThemeMode.light,

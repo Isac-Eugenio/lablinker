@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:lablinker/app/shared/routes/app_context.dart';
 import 'package:lablinker/app/shared/routes/routes.dart';
 import 'package:lablinker/app/views/base_view.dart';
-import 'package:lablinker/app/views/bluetooth/bluetooth_case.dart';
+import 'package:lablinker/app/shared/communication/bluetooth/bluetooth_case.dart';
 import 'package:lablinker/app/views/console/bluetooth/console_bluetooth_model_view.dart';
 import 'package:provider/provider.dart';
 
@@ -12,6 +13,14 @@ class ConsoleBluetoothView extends BaseView {
         title: titleView,
         rollback: true,
         route: Routes.protocolsRoute.path,
+        actionsAppBar: [
+          IconButton.outlined(
+            onPressed: () =>
+                AppContext.pushReplacementNamed(Routes.bluetoohMenuRoute.path),
+            style: IconButton.styleFrom(side: BorderSide.none),
+            icon: const Icon(Icons.add),
+          ),
+        ],
       );
 
   @override

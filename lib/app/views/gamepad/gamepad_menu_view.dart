@@ -38,16 +38,14 @@ class GamepadMenuViewState extends BaseViewState<GamepadMenuView> {
             ItemPageWidget(
               title: 'Bluetooth',
               icon: Icons.bluetooth_outlined,
+              route: Routes.bluetoohMenuRoute.path,
             ),
             ItemPageWidget(
               title: 'Http',
               icon: Icons.http_outlined,
               // Sem rota definida → apenas visual
             ),
-            ItemPageWidget(
-              title: 'Mqtt',
-              icon: Icons.sensors_outlined,
-            ),
+            ItemPageWidget(title: 'Mqtt', icon: Icons.sensors_outlined),
           ],
           mode: AdaptiveGridMenuMode.grid,
         ),

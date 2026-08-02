@@ -42,7 +42,9 @@ class MessageBubbleWidget extends StatelessWidget {
     // --- Cores do texto ---
     final Color messageColor = isUser ? userTextColor : clientTextColor;
     final Color titleColor = isUser
+        // ignore: deprecated_member_use
         ? userTextColor.withOpacity(0.8)
+        // ignore: deprecated_member_use
         : clientTextColor.withOpacity(0.7);
 
     // --- Bordas arredondadas (diferente para usuário/cliente) ---

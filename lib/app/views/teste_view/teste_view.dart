@@ -7,8 +7,7 @@ import 'package:provider/provider.dart';
 
 class TesteView extends BaseView {
   TesteView({super.key})
-    : super(*/
-/**//*
+    : super(
 
         title: 'Testando Bluetooth',
         rollback: false,
