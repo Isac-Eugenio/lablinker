@@ -8,6 +8,7 @@ Autor: Isac Eugenio
 */
 
 import 'package:flutter/material.dart';
+import 'package:lablinker/app/shared/routes/route_context.dart';
 
 class ItemPageWidget extends StatelessWidget {
   final String title; // Título do item
@@ -30,7 +31,7 @@ class ItemPageWidget extends StatelessWidget {
       onTap: () {
         action?.call();
         if (route != null) {
-          Navigator.of(context).pushReplacementNamed(route!);
+          RouteContext.pushNamed(route!);
         }
       }, // Navega se rota definida
       child: Card(

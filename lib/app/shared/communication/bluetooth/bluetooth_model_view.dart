@@ -4,7 +4,6 @@ import 'package:flutter_bluetooth_classic_serial/flutter_bluetooth_classic.dart'
 import 'package:lablinker/app/shared/communication/bluetooth/bluetooth_case.dart';
 import 'package:lablinker/app/shared/communication/bluetooth/bluetooth_command.dart';
 
-
 abstract class BluetoothModelView extends ChangeNotifier {
   final BluetoothCase bluetoothCase;
 
@@ -16,7 +15,10 @@ abstract class BluetoothModelView extends ChangeNotifier {
       BluetoothCommand<List<BluetoothDevice>>();
 
   List<BluetoothDevice>? get devicePaired => _updateCommand.result?.getOrNull();
-  bool get isInitialized => _initCommand.isSuccess;
+
+  BluetoothDevice? get connectedDevice => bluetoothCase.value.connectedDevice;
+
+  bool get isInitialized => bluetoothCase.value.isAvailable;
 
   Future<bool> init() async {
     await _initCommand.executeAsync(bluetoothCase.initializeBluetooth);
@@ -30,7 +32,7 @@ abstract class BluetoothModelView extends ChangeNotifier {
     await _updateCommand.executeAsync(bluetoothCase.updatePairedDevices);
 
     notifyListeners();
-    
+
     return _updateCommand.isSuccess;
   }
 
@@ -42,6 +44,8 @@ abstract class BluetoothModelView extends ChangeNotifier {
 
     notifyListeners();
 
+    debugPrint(_connectCommand.error.toString());
+
     return _connectCommand.isSuccess;
   }
 
@@ -51,5 +55,13 @@ abstract class BluetoothModelView extends ChangeNotifier {
     notifyListeners();
 
     return _connectCommand.isSuccess;
+  }
+
+  bool isConnected(BluetoothDevice? device) {
+    final connected = connectedDevice;
+
+    if (connected == null || device == null) return false;
+    
+    return connected.address == device.address;
   }
 }

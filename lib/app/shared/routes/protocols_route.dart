@@ -8,9 +8,11 @@ class ProtocolsRoute extends RouteConfig {
 
   final ModeTypeview modeTypeview;
 
-  const ProtocolsRoute(this.modeTypeview) : super("Meio de Comunicação", getPath, null);
+  const ProtocolsRoute(this.modeTypeview)
+    : super("Meio de Comunicação", getPath, null);
 
   PageTransition<dynamic> get materialPage => PageTransition(
+    settings: RouteSettings(name: path),
     type: PageTransitionType.rightToLeft,
     alignment: Alignment.center,
     duration: const Duration(milliseconds: 600),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lablinker/app/shared/routes/app_context.dart';
+import 'package:lablinker/app/shared/routes/route_context.dart';
 import 'package:lablinker/app/shared/routes/routes.dart';
 import 'package:lablinker/app/views/base_view.dart';
 import 'package:lablinker/app/shared/communication/bluetooth/bluetooth_case.dart';
@@ -16,7 +16,7 @@ class ConsoleBluetoothView extends BaseView {
         actionsAppBar: [
           IconButton.outlined(
             onPressed: () =>
-                AppContext.pushReplacementNamed(Routes.bluetoohMenuRoute.path),
+                RouteContext.pushNamed(Routes.bluetoohMenuRoute.path),
             style: IconButton.styleFrom(side: BorderSide.none),
             icon: const Icon(Icons.add),
           ),
@@ -38,7 +38,9 @@ class ConsoleBluetoothViewState extends BaseViewState {
 
     model.addListener(_onModelChanged);
 
-    Future.microtask(() => model.init());
+    Future.microtask(
+      () => Future.microtask(() => model.isInitialized ? () {} : model.init()),
+    );
   }
 
   void _onModelChanged() {

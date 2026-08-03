@@ -9,9 +9,10 @@ class HomeRoute extends RouteConfig {
   const HomeRoute() : super("Home", getPath, null);
 
   PageTransition<dynamic> get materialPage => PageTransition(
-        type: PageTransitionType.rightToLeft,
-        alignment: Alignment.center,
-        duration: const Duration(milliseconds: 600),
-        child: HomeView(title: super.alias),
-      );
+    settings: RouteSettings(name: path),
+    type: PageTransitionType.rightToLeft,
+    alignment: Alignment.center,
+    duration: const Duration(milliseconds: 600),
+    child: HomeView(title: super.alias),
+  );
 }

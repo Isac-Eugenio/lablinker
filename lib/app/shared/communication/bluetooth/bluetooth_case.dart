@@ -28,7 +28,7 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
   StreamSubscription? get dataSub => _dataSub;
   StreamSubscription? get connSub => _connSub;
 
-  BluetoothCase(this._repo) : super(const BluetoothState());
+  BluetoothCase(this._repo) : super(const BluetoothState()) ;
 
   // -----------------------------------------------------------
   // Inicializar Bluetooth e ouvir streams
@@ -70,7 +70,7 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
       final connected = await _repo.connect(device.address);
 
       if (!connected) {
-        return Failure(Exception('Falha ao conectar'));
+        return Failure(Exception('conexão mal sucessida'));
       }
 
       value = value.copyWith(
@@ -149,6 +149,9 @@ class BluetoothCase extends ValueNotifier<BluetoothState> {
   // Ouvir streams do Repository
   // -----------------------------------------------------------
   void _listenStreams() {
+    _connSub?.cancel();
+    _dataSub?.cancel();
+
     _connSub = _repo.connectionStream.listen((state) {
       value = value.copyWith(
         connectionState: state,

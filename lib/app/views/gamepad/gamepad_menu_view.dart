@@ -8,10 +8,13 @@ Autor: Isac Eugenio
 */
 
 import 'package:flutter/material.dart';
+import 'package:lablinker/app/shared/communication/bluetooth/bluetooth_case.dart';
 import 'package:lablinker/app/shared/routes/routes.dart';
 import 'package:lablinker/app/views/base_view.dart';
 import 'package:lablinker/app/shared/widgets/adaptive_grid_menu.dart';
 import 'package:lablinker/app/shared/widgets/item_page_widget.dart';
+import 'package:lablinker/app/views/gamepad/gamepad_menu_model_view.dart';
+import 'package:provider/provider.dart';
 
 class GamepadMenuView extends BaseView {
   GamepadMenuView({super.key})
@@ -29,6 +32,36 @@ class GamepadMenuView extends BaseView {
 }
 
 class GamepadMenuViewState extends BaseViewState<GamepadMenuView> {
+  late final GamepadMenuModelView model;
+
+  @override
+  void initState() {
+    super.initState();
+
+    model = GamepadMenuModelView(context.read<BluetoothCase>());
+
+    model.addListener(_onModelChanged);
+
+    debugPrint("${model.bluetoothCase.value.isAvailable}");
+
+    Future.microtask(
+      () => model.isInitialized ? () {} : model.init(),
+    );
+  }
+
+  void _onModelChanged() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    model.removeListener(_onModelChanged);
+    model.dispose();
+    super.dispose();
+  }
+
   @override
   Widget buildBody(BuildContext context) {
     return SafeArea(
@@ -43,6 +76,9 @@ class GamepadMenuViewState extends BaseViewState<GamepadMenuView> {
             ItemPageWidget(
               title: 'Http',
               icon: Icons.http_outlined,
+              action: () {
+                debugPrint(model.connectedDevice?.name ?? "sem nome");
+              },
               // Sem rota definida → apenas visual
             ),
             ItemPageWidget(title: 'Mqtt', icon: Icons.sensors_outlined),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lablinker/app/shared/communication/bluetooth/bluetooth_menu__model_view.dart';
-import 'package:lablinker/app/shared/communication/bluetooth/bluetooth_model_view.dart';
-import 'package:lablinker/app/shared/routes/routes.dart';
+import 'package:lablinker/app/shared/routes/route_context.dart';
 import 'package:lablinker/app/views/base_view.dart';
 import 'package:provider/provider.dart';
 
@@ -9,7 +8,7 @@ import 'bluetooth_case.dart';
 
 class BluetoothMenuView extends BaseView {
   BluetoothMenuView({super.key, required super.title})
-    : super(rollback: true, route: Routes.protocolsRoute.path);
+    : super(rollback: false, route: RouteContext.previousRoute.value?.path);
 
   @override
   BaseViewState<BaseView> createState() => BluetoothMenuViewState();
@@ -17,6 +16,8 @@ class BluetoothMenuView extends BaseView {
 
 class BluetoothMenuViewState extends BaseViewState {
   late BluetoothMenuModelView model;
+
+  late bool isConnected;
 
   void _onModelChanged() {
     if (mounted) {
@@ -32,7 +33,13 @@ class BluetoothMenuViewState extends BaseViewState {
 
     model.addListener(_onModelChanged);
 
-    Future.microtask(() => model.init());
+    debugPrint("${model.bluetoothCase.value.isAvailable}");
+
+    Future.microtask(
+      () => Future.microtask(
+        () => model.bluetoothCase.value.isAvailable ? () {} : model.init(),
+      ),
+    );
   }
 
   @override
@@ -50,43 +57,60 @@ class BluetoothMenuViewState extends BaseViewState {
       );
     }
 
-    return Padding(
-      padding: const EdgeInsets.all(16),
+    return SafeArea(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Bloco 1 - Botão
-          ElevatedButton.icon(
-            onPressed: () {
-              model.update();
-            },
-            icon: const Icon(Icons.refresh),
-            label: const Text("Atualizar lista"),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: ElevatedButton.icon(
+              onPressed: () {
+                model.update();
+              },
+              icon: const Icon(Icons.refresh),
+              label: const Text("Atualizar lista"),
+            ),
           ),
-
-          const SizedBox(height: 16),
 
           // Bloco 2 - Card com lista
           Expanded(
-            child: Card(
-              elevation: 2,
-              child: ListView.separated(
-                padding: const EdgeInsets.all(8),
-                itemCount: model.devicePaired?.length ?? 0,
-                separatorBuilder: (_, _) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final device = model.devicePaired?[index];
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+              child: Card(
+                elevation: 2,
+                child: ListView.separated(
+                  padding: const EdgeInsets.all(8),
+                  itemCount: model.devicePaired?.length ?? 0,
+                  separatorBuilder: (_, _) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final device = model.devicePaired?[index];
 
-                  return ListTile(
-                    leading: const Icon(Icons.bluetooth),
-                    title: Text(device?.name ?? "Dispositivo sem nome"),
-                    subtitle: Text(device?.address ?? ""),
-                    trailing: const Icon(Icons.chevron_right),
-                    onTap: () {
-                      // Conectar ao dispositivo
-                    },
-                  );
-                },
+                    return ListTile(
+                      leading: Icon(
+                        Icons.bluetooth,
+                        color: model.isConnected(device)
+                            ? Colors.green
+                            : Colors.grey,
+                      ),
+                      title: Text(device?.name ?? "Dispositivo sem nome"),
+                      subtitle: Text(device?.address ?? ""),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () async {
+                        if (device != null) {
+                          debugPrint("conectando em ${device.name}");
+                          bool res = await model.connect(device);
+
+                          debugPrint(
+                            res
+                                ? "conectado em ${model.bluetoothCase.value.connectedDevice!.name}"
+                                : "falha ao conectar em ${device.name}",
+                          );
+                        }
+                      },
+                    );
+                  },
+                ),
               ),
             ),
           ),

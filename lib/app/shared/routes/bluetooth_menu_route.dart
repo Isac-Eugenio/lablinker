@@ -6,9 +6,10 @@ import 'package:page_transition/page_transition.dart';
 class BluetoohMenuRoute extends RouteConfig {
   static const String getPath = "/bluetooth_menu";
 
-  const BluetoohMenuRoute() : super("Configuração do Bluetooth", getPath, null);
+  const BluetoohMenuRoute() : super("   Conectar Bluetooth", getPath, null);
 
   PageTransition<dynamic> get materialPage => PageTransition(
+    settings: RouteSettings(name: path),
     type: PageTransitionType.rightToLeft,
     alignment: Alignment.center,
     duration: const Duration(milliseconds: 600),
