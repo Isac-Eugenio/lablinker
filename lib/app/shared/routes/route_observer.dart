@@ -8,6 +8,10 @@ class RouteObserverApp extends NavigatorObserver {
     RouteContext.previousRoute.set(RouteContext.currentRoute.get());
 
     RouteContext.currentRoute.set(Routes.fromPath(route.settings.name));
+
+     debugPrint(
+      "Routa mudou didpush: atual ${RouteContext.currentRoute.value} anterior ${RouteContext.previousRoute.value}",
+    );
   }
 
   @override

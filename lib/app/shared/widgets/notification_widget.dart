@@ -8,26 +8,31 @@ Autor: Isac Eugenio
 
 import 'package:flutter/material.dart';
 
+enum NotificationType {
+  failure(Colors.deepOrangeAccent),
+  message(Colors.white10),
+  loading(Colors.yellow),
+  success(Colors.green),
+  error(Colors.red);
+
+  final Color color;
+
+  const NotificationType(this.color);
+}
+
 class NotificationWidget {
-  // Contexto da tela onde a notificação será exibida
-  final BuildContext context;
+  static final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
-  // Mensagem que será mostrada
-  final String message;
-
-  // Duração em segundos da exibição do SnackBar
-  final int durationSeconds;
-
-  NotificationWidget({
-    required this.context,
-    required this.message,
-    required this.durationSeconds,
+  static void show(
+    String message, {
+    int durationSeconds = 3,
+    NotificationType typeMessage = NotificationType.message,
   }) {
-    // Mostra o SnackBar automaticamente ao instanciar
-    ScaffoldMessenger.of(context).showSnackBar(
+    scaffoldMessengerKey.currentState?.showSnackBar(
       SnackBar(
         content: Text(message),
         duration: Duration(seconds: durationSeconds),
+        backgroundColor: typeMessage.color,
       ),
     );
   }

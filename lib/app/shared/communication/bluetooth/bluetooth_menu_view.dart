@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:lablinker/app/shared/communication/bluetooth/bluetooth_menu__model_view.dart';
+import 'package:lablinker/app/shared/communication/bluetooth/bluetooth_menu_model_view.dart';
 import 'package:lablinker/app/shared/routes/route_context.dart';
-import 'package:lablinker/app/views/base_view.dart';
+import 'package:lablinker/app/shared/widgets/base_view.dart';
 import 'package:provider/provider.dart';
 
 import 'bluetooth_case.dart';
@@ -32,8 +32,6 @@ class BluetoothMenuViewState extends BaseViewState {
     model = BluetoothMenuModelView(context.read<BluetoothCase>());
 
     model.addListener(_onModelChanged);
-
-    debugPrint("${model.bluetoothCase.value.isAvailable}");
 
     Future.microtask(
       () => Future.microtask(
@@ -86,29 +84,33 @@ class BluetoothMenuViewState extends BaseViewState {
                   itemBuilder: (context, index) {
                     final device = model.devicePaired?[index];
 
-                    return ListTile(
-                      leading: Icon(
-                        Icons.bluetooth,
-                        color: model.isConnected(device)
-                            ? Colors.green
-                            : Colors.grey,
-                      ),
-                      title: Text(device?.name ?? "Dispositivo sem nome"),
-                      subtitle: Text(device?.address ?? ""),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () async {
-                        if (device != null) {
-                          debugPrint("conectando em ${device.name}");
-                          bool res = await model.connect(device);
-
-                          debugPrint(
-                            res
-                                ? "conectado em ${model.bluetoothCase.value.connectedDevice!.name}"
-                                : "falha ao conectar em ${device.name}",
+                    return (device == null)
+                        ? ListTile(
+                            title: Text("Dispositivo sem nome"),
+                            subtitle: Text(""),
+                          )
+                        : ListTile(
+                            leading:
+                                model.isConnectingDevice(device) ||
+                                    model.isDisconnectingDevice(device)
+                                ? SizedBox(
+                                    width: 24,
+                                    height: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                    ),
+                                  )
+                                : Icon(
+                                    Icons.bluetooth,
+                                    color: model.isConnected(device)
+                                        ? Colors.green
+                                        : Colors.grey,
+                                  ),
+                            title: Text(device.name),
+                            subtitle: Text(device.address),
+                            trailing: const Icon(Icons.chevron_right),
+                            onTap: () => model.toggleConnection(device),
                           );
-                        }
-                      },
-                    );
                   },
                 ),
               ),

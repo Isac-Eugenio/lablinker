@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lablinker/app/shared/routes/route_context.dart';
 import 'package:lablinker/app/shared/routes/routes.dart';
-import 'package:lablinker/app/views/base_view.dart';
+import 'package:lablinker/app/shared/widgets/base_view.dart';
 import 'package:lablinker/app/shared/communication/bluetooth/bluetooth_case.dart';
 import 'package:lablinker/app/views/console/bluetooth/console_bluetooth_model_view.dart';
 import 'package:provider/provider.dart';
@@ -67,14 +67,7 @@ class ConsoleBluetoothViewState extends BaseViewState {
     return Center(
       child: ElevatedButton(
         onPressed: () {
-          model
-              .update()
-              .then((v) {
-                debugPrint("Carregando");
-              })
-              .whenComplete(() {
-                debugPrint("${model.devicePaired}");
-              });
+          model.update();
         },
         child: Text("teste"),
       ),

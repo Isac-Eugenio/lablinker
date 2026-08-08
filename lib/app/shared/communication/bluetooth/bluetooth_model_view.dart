@@ -43,9 +43,6 @@ abstract class BluetoothModelView extends ChangeNotifier {
     );
 
     notifyListeners();
-
-    debugPrint(_connectCommand.error.toString());
-
     return _connectCommand.isSuccess;
   }
 
@@ -57,11 +54,5 @@ abstract class BluetoothModelView extends ChangeNotifier {
     return _connectCommand.isSuccess;
   }
 
-  bool isConnected(BluetoothDevice? device) {
-    final connected = connectedDevice;
 
-    if (connected == null || device == null) return false;
-    
-    return connected.address == device.address;
-  }
 }

@@ -10,8 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:lablinker/app/shared/routes/route_context.dart';
 import 'package:lablinker/app/shared/routes/route_observer.dart';
 import 'package:lablinker/app/shared/routes/routes.dart';
-import 'package:lablinker/app/shared/theme/theme_modelview.dart';
-import 'package:provider/provider.dart';
+import 'package:lablinker/app/shared/theme/theme_app.dart';
+import 'package:lablinker/app/shared/widgets/notification_widget.dart';
 
 class AppWidget extends StatelessWidget {
   const AppWidget({super.key});
@@ -31,13 +31,15 @@ class AppWidget extends StatelessWidget {
       // navegador global para acessar um context estatico
       navigatorKey: RouteContext.navigatorKey,
 
+      // Observer para gerenciar as rotas anteriores e atuais
       navigatorObservers: [RouteObserverApp()],
+
+      scaffoldMessengerKey: NotificationWidget.scaffoldMessengerKey,
 
       // Define o modo de tema (claro/escuro) baseado no sistema
       themeMode: ThemeMode.light,
-
       // Aplica o tema atual do provider ThemeModelView
-      theme: Provider.of<ThemeModelView>(context).value,
+      theme: ThemeApp.themeData,
     );
   }
 }

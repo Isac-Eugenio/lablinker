@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:lablinker/app/shared/routes/routes_config.dart';
-import 'package:lablinker/app/views/console/bluetooth/console_bluetooth_view.dart';
 import 'package:lablinker/app/views/gamepad/gamepad_menu_view.dart';
 import 'package:page_transition/page_transition.dart';
 

@@ -10,7 +10,7 @@ Autor: Isac Eugenio
 import 'package:flutter/material.dart';
 import 'package:lablinker/app/shared/communication/bluetooth/bluetooth_case.dart';
 import 'package:lablinker/app/shared/routes/routes.dart';
-import 'package:lablinker/app/views/base_view.dart';
+import 'package:lablinker/app/shared/widgets/base_view.dart';
 import 'package:lablinker/app/shared/widgets/adaptive_grid_menu.dart';
 import 'package:lablinker/app/shared/widgets/item_page_widget.dart';
 import 'package:lablinker/app/views/gamepad/gamepad_menu_model_view.dart';
